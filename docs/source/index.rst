@@ -93,7 +93,7 @@ To query for a range of masses (step how you want to):
     # To query for a range of masses (step how you want to):
     python -m catholic_mass_readings get-mass-range --start 2024-12-25 --end 2025-01-01 --step 7
 
-    ...Or saving to a file
+    #or saving to a file...
 
     # To get a mass for a particular date:
     python -m catholic_mass_readings get-mass --date 2024-12-25 --save mass.json

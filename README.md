@@ -72,7 +72,7 @@ python -m catholic_mass_readings get-sunday-mass-range --start 2024-12-25 --end 
 python -m catholic_mass_readings get-mass-range --start 2024-12-25 --end 2025-01-01 --step 7
 ```
 
-...Or saving to a file
+or saving to a file...
 
 ```sh
 # To get a mass for a particular date:
