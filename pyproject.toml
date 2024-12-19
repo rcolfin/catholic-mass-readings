@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "catholic-mass-readings"
-version = "0.1.0"
+version = "0.2.0"
 description = "Provides an API for scraping the web page from https://bible.usccb.org/bible/readings/ to get the readings"
 authors = ["Robert Colfin <robert.m.colfin@gmail.com>"]
 readme = "README.md"
@@ -12,15 +12,17 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
-keywords = ["catholic"]
+keywords = ["catholic", "daily", "readings", "scripture", "usccb"]
 
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.9"
 bs4 = "^0.0.2"
 aiofiles = "^24.1.0"
 aiohttp = "^3.11.11"
@@ -70,7 +72,7 @@ exclude = [
 
 line-length = 120
 indent-width = 4
-target-version = "py311"
+target-version = "py310"
 namespace-packages = ["docs/source"]
 
 

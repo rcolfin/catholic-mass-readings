@@ -4,12 +4,13 @@ import contextlib
 import datetime
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Self, cast
+from typing import TYPE_CHECKING, cast
 from urllib.parse import urlparse
 
 import aiohttp
 from bs4 import BeautifulSoup
 from bs4.element import Tag
+from typing_extensions import Self
 
 from catholic_mass_readings import constants, models, utils
 
