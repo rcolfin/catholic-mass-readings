@@ -131,13 +131,18 @@ class Mass(NamedTuple):
         return str(self)
 
     def __str__(self) -> str:
-        return f"{self.date} {self.title} ({self.url})"
+        return f"{self.date_str} {self.title} ({self.url})"
+
+    @property
+    def date_str(self) -> str:
+        """Gets the formatted date"""
+        return self.date.strftime("%B %d, %Y") if self.date else ""
 
     def dumps(self) -> str:
         """Returns a formatted representation of the mass."""
-        lines: list[Any] = [self.title, self.date, self.url]
+        lines: list[Any] = [self.title, self.date_str, self.url]
         for section in self.sections:
-            lines.extend(f"{section.header}: {reading}\n\n{reading.text}" for reading in section.readings)
+            lines.extend(f"\n{section.header}: {reading}\n\n{reading.text}" for reading in section.readings)
 
         return "\n".join(map(str, lines))
 
