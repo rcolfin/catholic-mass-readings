@@ -19,10 +19,10 @@ class SectionType(IntEnum):
     SEQUENCE = auto()
 
     def __repr__(self) -> str:
-        return str(self)
+        return self._name_
 
     def __str__(self) -> str:
-        return self.name
+        return repr(self)
 
     @property
     def is_unknown(self) -> bool:
@@ -67,10 +67,10 @@ class Verse(NamedTuple):
     link: str
 
     def __repr__(self) -> str:
-        return str(self)
+        return f"{self.text} ({self.link})"
 
     def __str__(self) -> str:
-        return f"{self.text} ({self.link})"
+        return repr(self)
 
     def to_dict(self) -> dict[str, Any]:
         """Returns a Dictionary representation"""
@@ -82,10 +82,10 @@ class Reading(NamedTuple):
     text: str
 
     def __repr__(self) -> str:
-        return str(self)
+        return ", ".join([v.text for v in self.verses])
 
     def __str__(self) -> str:
-        return ", ".join([v.text for v in self.verses])
+        return repr(self)
 
     def with_text(self, text: str) -> Reading:
         """Replaces the text with the new text returning a new instance."""
@@ -102,10 +102,10 @@ class Section(NamedTuple):
     readings: list[Reading]
 
     def __repr__(self) -> str:
-        return str(self)
+        return f"{self.type_} {self.header}"
 
     def __str__(self) -> str:
-        return f"{self.type_} {self.header}"
+        return repr(self)
 
     def add_alternative(self, reading: Reading | Iterable[Reading]) -> Section:
         """Returns a new Section that appends the other alternative Reading"""
@@ -128,10 +128,10 @@ class Mass(NamedTuple):
     sections: list[Section]
 
     def __repr__(self) -> str:
-        return str(self)
+        return f"{self.date_str} {self.title} ({self.url})"
 
     def __str__(self) -> str:
-        return f"{self.date_str} {self.title} ({self.url})"
+        return repr(self)
 
     @property
     def date_str(self) -> str:
