@@ -33,7 +33,7 @@ async def get_readings(date: datetime.date, save: str | None) -> None:
             logger.error("Failed to retrieve mass for %s", date)
             return
 
-    print(mass.dumps())  # noqa: T201
+    print(mass)  # noqa: T201
 
     if save is not None:
         save_path = Path(save)
@@ -73,7 +73,7 @@ async def _get_readings_range(dates: Iterable[datetime.date], save: str | None) 
 
     for mass in masses:
         end = "\n" if mass is masses[-1] else "\n\n"
-        print(mass.dumps(), end=end)  # noqa: T201
+        print(mass, end=end)  # noqa: T201
 
     if save is not None:
         save_path = Path(save)

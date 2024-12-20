@@ -98,7 +98,8 @@ class USCCB:
 
     async def get_mass_from_date(self, dt: datetime.date) -> models.Mass | None:
         """Gets the mass for the specified date."""
-        for url in [self._get_day_url(dt), self._get_url(dt)]:
+        for urlfmt in constants.DAILY_READING_URL_FMTS:
+            url = urlfmt.format(DATE=dt)
             with contextlib.suppress(aiohttp.ClientResponseError):
                 return await self._get_mass(url, dt)
 
@@ -217,14 +218,6 @@ class USCCB:
     @staticmethod
     def _clean_text(string: str) -> str:
         return string.replace("\xa0", " ")
-
-    @staticmethod
-    def _get_url(dt: datetime.date) -> str:
-        return f"https://bible.usccb.org/bible/readings/{dt:%m%d%y}.cfm"
-
-    @staticmethod
-    def _get_day_url(dt: datetime.date) -> str:
-        return f"https://bible.usccb.org/bible/readings/{dt:%m%d%y}-Day.cfm"
 
     def _ensure_session(self) -> aiohttp.ClientSession:
         if self._session is None:

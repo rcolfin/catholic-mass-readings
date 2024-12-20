@@ -3,6 +3,8 @@ from __future__ import annotations
 from enum import IntEnum, auto, unique
 from typing import TYPE_CHECKING, Any, NamedTuple
 
+from catholic_mass_readings import constants, utils
+
 if TYPE_CHECKING:
     import datetime
     from collections.abc import Iterable
@@ -19,7 +21,7 @@ class SectionType(IntEnum):
     SEQUENCE = auto()
 
     def __repr__(self) -> str:
-        return self._name_
+        return self.name
 
     def __str__(self) -> str:
         return repr(self)
@@ -72,6 +74,11 @@ class Verse(NamedTuple):
     def __str__(self) -> str:
         return repr(self)
 
+    @property
+    def book(self) -> dict[str, str] | None:
+        """Gets the book for this verse."""
+        return utils.get_book_from_verse(self.link, self.text)
+
     def to_dict(self) -> dict[str, Any]:
         """Returns a Dictionary representation"""
         return {"text": self.text, "link": self.link}
@@ -86,6 +93,41 @@ class Reading(NamedTuple):
 
     def __str__(self) -> str:
         return repr(self)
+
+    @property
+    def header(self) -> str:
+        """Gets the header for this reading."""
+        books = (v.book for v in self.verses)
+        book = next((b for b in books if b), None)
+        if book is None:
+            return str(self)
+
+        return book["name"] + " " + ", ".join([utils.strip_book_abbreviations_from_text(v.text) for v in self.verses])
+
+    @property
+    def title(self) -> str | None:
+        """Gets the display header for this reading."""
+        books = (v.book for v in self.verses)
+        book = next((b for b in books if b), None)
+        if book is None:
+            return None
+
+        return constants.READING_TITLE_FMT.format(TITLE=book["title"])
+
+    def format(self, parent: Section) -> str:
+        """
+        Returns a formatted representation of the Reading
+
+        Args:
+            parent (Section): The parent Section of this Reading.
+
+        Returns:
+            str representation of the reading.
+        """
+        if parent.type_ in (SectionType.READING, SectionType.GOSPEL):
+            return f"{parent.display_header}: {self.header}\n{self.title}\n\n{self.text}\n{parent.footer}"
+
+        return f"{parent.display_header}: {self.header}\n\n{self.text}"
 
     def with_text(self, text: str) -> Reading:
         """Replaces the text with the new text returning a new instance."""
@@ -105,20 +147,52 @@ class Section(NamedTuple):
         return f"{self.type_} {self.header}"
 
     def __str__(self) -> str:
-        return repr(self)
+        """
+        Returns a formatted representation of the Section.
+
+        Args:
+            take_all (bool): Flag indicating whether to take all the readings not just the first.
+
+        Returns:
+            str representation of the section.
+        """
+        lines = (reading.format(self) for reading in self.readings)
+        return "\n".join(lines)
+
+    @property
+    def display_header(self) -> str:
+        if self.type_ == SectionType.READING:
+            reading_number = utils.get_reading_number(self.header)
+            return constants.SECTION_HEADER_READINGS.get(reading_number, self.header) if reading_number else self.header
+
+        return self.header
+
+    @property
+    def footer(self) -> str:
+        if self.type_.is_reading:
+            return f"\n{constants.READING_CLOSE_REMARKS}\n{constants.READING_CLOSE_RESPONSE}"
+
+        if self.type_.is_gospel:
+            return f"\n{constants.GOSPEL_CLOSE_REMARKS}\n{constants.GOSPEL_CLOSE_RESPONSE}"
+
+        return ""
 
     def add_alternative(self, reading: Reading | Iterable[Reading]) -> Section:
         """Returns a new Section that appends the other alternative Reading"""
         readings = [*self.readings]
         if isinstance(reading, Reading):
-            readings.append(reading)
+            readings.append(self._adapt_reading(reading))
         else:
-            readings.extend(reading)
+            readings.extend(map(self._adapt_reading, reading))
         return Section(self.type_, self.header, readings)
 
     def to_dict(self) -> dict[str, Any]:
         """Returns a Dictionary representation"""
         return {"type": self.type_.name, "header": self.header, "readings": [r.to_dict() for r in self.readings]}
+
+    def _adapt_reading(self, reading: Reading) -> Reading:
+        """Reuse the verses from the current Reading if reading instance has none."""
+        return reading if reading.verses else Reading(self.readings[-1].verses, reading.text)
 
 
 class Mass(NamedTuple):
@@ -131,20 +205,24 @@ class Mass(NamedTuple):
         return f"{self.date_str} {self.title} ({self.url})"
 
     def __str__(self) -> str:
-        return repr(self)
+        """
+        Returns a formatted representation of the mass.
+
+        Args:
+            take_all (bool): Flag indicating whether to take all the readings not just the first.
+
+        Returns:
+            str representation of the section.
+        """
+        lines: list[Any] = [self.title, self.date_str, self.url]
+        lines.extend("\n" + str(section) for section in self.sections)
+
+        return "\n".join(map(str, lines))
 
     @property
     def date_str(self) -> str:
         """Gets the formatted date"""
         return self.date.strftime("%B %d, %Y") if self.date else ""
-
-    def dumps(self) -> str:
-        """Returns a formatted representation of the mass."""
-        lines: list[Any] = [self.title, self.date_str, self.url]
-        for section in self.sections:
-            lines.extend(f"\n{section.header}: {reading}\n\n{reading.text}" for reading in section.readings)
-
-        return "\n".join(map(str, lines))
 
     def to_dict(self) -> dict[str, Any]:
         """Returns a dictionary representation."""
