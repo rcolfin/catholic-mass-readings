@@ -172,10 +172,15 @@ class USCCB:
 
     def _get_verses(self, parent: Tag) -> list[models.Verse]:
         """Gets the verses"""
-        return [
-            models.Verse(self._clean_text(a.get_text(strip=True)), cast(str, a["href"]).strip())
-            for a in parent.findChildren(name="a", href=True)
-        ]
+        return list(map(self._create_verse, parent.findChildren(name="a", href=True)))
+
+    def _create_verse(self, a: Tag) -> models.Verse:
+        """Creates a verse from the specified Tag."""
+        text = self._clean_text(a.get_text(strip=True))
+        link = cast(str, a["href"]).strip()
+        book_dict = utils.get_book_from_verse(link, text)
+        book = book_dict["name"] if book_dict else None
+        return models.Verse(text, link, book)
 
     def _get_readings(self, container: Tag, verses: list[models.Verse]) -> Iterable[models.Reading]:
         content_body = cast(Tag, container.findChild(class_="content-body"))

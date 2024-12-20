@@ -31,10 +31,10 @@ def find_iter(parent: Tag, *, name: str | None = None, class_: str | None = None
 
 def get_book_from_verse(link: str, text: str) -> dict[str, str] | None:
     """Searches for the book based on the link and text"""
-    book = _choose_book(_get_book_name_from_link(link))
+    book = lookup_book(_get_book_name_from_link(link))
     if book:
         return book
-    books = map(_choose_book, _get_book_abbreviations_from_text(text))
+    books = map(lookup_book, _get_book_abbreviations_from_text(text))
     return next(books, None)
 
 
@@ -155,11 +155,19 @@ def _get_book_abbreviations_from_text(text: str) -> Iterable[str]:
     return (m.group(1) for m in _ABBREVIATED_BOOK_PATTERN.finditer(text))
 
 
-def _choose_book(key: str | None) -> dict[str, str] | None:
+def lookup_book(key: str | None) -> dict[str, str] | None:
+    """
+    Looks up a book based on the key.
+
+    >>> lookup_book("Gn")["name"]
+    'Genesis'
+    >>> lookup_book("1 Chr")["name"]
+    '1 Chronicles'
+    """
     if key is None:
         return None
 
-    key = key.casefold()
+    key = key.replace(" ", "").strip().casefold()
     old_testament = _get_old_testament_book_lookup()
     new_testament = _get_new_testament_book_lookup()
     old_testament_book = old_testament.get(key)

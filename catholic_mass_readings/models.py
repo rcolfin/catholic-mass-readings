@@ -66,7 +66,11 @@ class SectionType(IntEnum):
 
 class Verse(NamedTuple):
     text: str
+    """The reference to the chapter and sentence."""
     link: str
+    """The link to the book."""
+    book: str | None
+    """The name of the book"""
 
     def __repr__(self) -> str:
         return f"{self.text} ({self.link})"
@@ -75,13 +79,19 @@ class Verse(NamedTuple):
         return repr(self)
 
     @property
-    def book(self) -> dict[str, str] | None:
-        """Gets the book for this verse."""
-        return utils.get_book_from_verse(self.link, self.text)
+    def _book_details(self) -> dict[str, str] | None:
+        """Gets the book details."""
+        return None if self.book is None else utils.lookup_book(self.book)
+
+    @property
+    def book_title(self) -> str | None:
+        """Gets the book title."""
+        book_details = self._book_details
+        return None if book_details is None else book_details["title"]
 
     def to_dict(self) -> dict[str, Any]:
         """Returns a Dictionary representation"""
-        return {"text": self.text, "link": self.link}
+        return {"text": self.text, "link": self.link, "book": self.book}
 
 
 class Reading(NamedTuple):
@@ -102,17 +112,17 @@ class Reading(NamedTuple):
         if book is None:
             return str(self)
 
-        return book["name"] + " " + ", ".join([utils.strip_book_abbreviations_from_text(v.text) for v in self.verses])
+        return book + " " + ", ".join([utils.strip_book_abbreviations_from_text(v.text) for v in self.verses])
 
     @property
     def title(self) -> str | None:
         """Gets the display header for this reading."""
-        books = (v.book for v in self.verses)
-        book = next((b for b in books if b), None)
-        if book is None:
+        book_titles = (v.book_title for v in self.verses)
+        book_title = next((b for b in book_titles if b), None)
+        if book_title is None:
             return None
 
-        return constants.READING_TITLE_FMT.format(TITLE=book["title"])
+        return constants.READING_TITLE_FMT.format(TITLE=book_title)
 
     def format(self, parent: Section) -> str:
         """
