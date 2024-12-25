@@ -3,9 +3,7 @@ from __future__ import annotations
 import contextlib
 import datetime
 import logging
-from pathlib import Path
-from typing import TYPE_CHECKING, cast
-from urllib.parse import urlparse
+from typing import TYPE_CHECKING, Final, cast
 
 import aiohttp
 from bs4 import BeautifulSoup
@@ -23,6 +21,15 @@ logger = logging.getLogger(__name__)
 
 class USCCB:
     """Interface for querying the Daily Readings from https://bible.usccb.org/bible/readings/"""
+
+    DEFAULT_MASS_TYPES: Final[list[models.MassType]] = [
+        models.MassType.DAY,
+        models.MassType.YEARA,
+        models.MassType.YEARB,
+        models.MassType.YEARC,
+        models.MassType.DEFAULT,
+    ]
+    """Default list of MassTypes to try when searching for a mass on a given mass date."""
 
     def __init__(self) -> None:
         self._session: aiohttp.ClientSession | None = None
@@ -92,32 +99,74 @@ class USCCB:
             yield dt
             dt += step
 
-    async def get_today_mass(self) -> models.Mass | None:
-        """Gets the mass for today."""
-        return await self.get_mass_from_date(self.today())
+    async def get_today_mass(
+        self,
+        type_: models.MassType | None = None,
+    ) -> models.Mass | None:
+        """
+        Gets the mass for today's date.
 
-    async def get_mass_from_date(self, dt: datetime.date) -> models.Mass | None:
-        """Gets the mass for the specified date."""
-        for urlfmt in constants.DAILY_READING_URL_FMTS:
-            url = urlfmt.format(DATE=dt)
+        Args:
+            type_ (MassType): The type of Mass (if not specified,
+                            then will select the first mass from DEFAULT_MASS_TYPES).
+
+        Returns:
+            Mass if retrieved from one of the MassTypes on the date.
+        """
+        today = self.today()
+        if type_ is not None:
+            return await self.get_mass(today, type_)
+        return await self.get_mass_from_date(today)
+
+    async def get_mass(
+        self,
+        date: datetime.date,
+        type_: models.MassType,
+    ) -> models.Mass | None:
+        """Gets the mass for the date and type."""
+        url = type_.to_url(date)
+        return await self._get_mass(url, date, type_)
+
+    async def get_mass_from_date(
+        self, date: datetime.date, types: list[models.MassType] | None = None
+    ) -> models.Mass | None:
+        """
+        Gets the first mass for the specified date and type.
+
+        Args:
+            date (datetime.date): The mass date.
+            types (list[models.MassType]): The list of mass types to use (defaults to DEFAULT_MASS_TYPES)
+
+        Returns:
+            Mass if retrieved from one of the MassTypes on the date.
+        """
+        if types is None:
+            types = self.DEFAULT_MASS_TYPES
+
+        for type_ in types:
+            url = type_.to_url(date)
             with contextlib.suppress(aiohttp.ClientResponseError):
-                return await self._get_mass(url, dt)
+                return await self._get_mass(url, date, type_)
 
-        logger.warning("No mass for %s", dt)
+        logger.warning("No mass for date: %s, types: %s", date, types)
         return None
 
-    async def get_mass(self, url: str) -> models.Mass | None:
-        """Gets the mass for the url."""
-        mass_date: datetime.date | None = None
+    async def get_mass_from_url(self, url: str) -> models.Mass | None:
+        """Gets the mass at the particular url."""
+        date: datetime.date | None = None
+        type_: models.MassType | str | None = None
         with contextlib.suppress(ValueError):
-            dt_str = Path(urlparse(url).path).with_suffix("").name.split("-")[0]
-            mass_date = (
-                datetime.datetime.strptime(dt_str, constants.DATE_FMT).astimezone(constants.DEFAULT_TIMEZONE).date()
-            )
+            parsed_url = utils.parse_url(url)
+            if parsed_url:
+                date = parsed_url[0]
+                type_ = parsed_url[1]
+                type_ = models.MassType(type_)
 
-        return await self._get_mass(url, mass_date)
+        return await self._get_mass(url, date, type_)
 
-    async def _get_mass(self, url: str, mass_date: datetime.date | None) -> models.Mass | None:
+    async def _get_mass(
+        self, url: str, date: datetime.date | None, type_: models.MassType | str | None
+    ) -> models.Mass | None:
         logger.debug("Querying url: %s", url)
         async with self._ensure_session().get(url, raise_for_status=True) as r:
             content = await r.text()
@@ -126,7 +175,7 @@ class USCCB:
         soup = BeautifulSoup(content, "html5lib")
         title = cast(Tag, soup.find("title"))
         sections: list[models.Section] = self._get_sections(soup)
-        return models.Mass(mass_date, url, title.get_text(strip=True).split("|")[0].strip(), sections)
+        return models.Mass(date, type_, url, title.get_text(strip=True).split("|")[0].strip(), sections)
 
     def _get_sections(self, soup: BeautifulSoup) -> list[models.Section]:
         """Parses the Sections (Readings 1, 2, Gospel, Psalms, etc)."""

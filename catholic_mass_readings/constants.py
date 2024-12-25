@@ -13,9 +13,14 @@ OR_PATTERN: Final[re.Pattern] = re.compile("OR[:]?$", re.IGNORECASE)
 DEFAULT_TIMEZONE: Final[datetime.tzinfo] = pytz.timezone("America/New_York")
 
 READING_TITLE_FMT: Final[str] = "A reading from the {TITLE}"
-DAILY_READING_URL_FMT: Final[str] = "https://bible.usccb.org/bible/readings/{DATE:%m%d%y}.cfm"
+DAILY_READING_DEFAULT_MSS_URL_FMT: Final[str] = "https://bible.usccb.org/bible/readings/{DATE:%m%d%y}.cfm"
+DAILY_READING_DAWN_MASS_URL_FMT: Final[str] = "https://bible.usccb.org/bible/readings/{DATE:%m%d%y}-Dawn.cfm"
 DAILY_READING_DAY_MASS_URL_FMT: Final[str] = "https://bible.usccb.org/bible/readings/{DATE:%m%d%y}-Day.cfm"
-DAILY_READING_URL_FMTS: Final[list[str]] = [DAILY_READING_DAY_MASS_URL_FMT, DAILY_READING_URL_FMT]
+DAILY_READING_NIGHT_MASS_URL_FMT: Final[str] = "https://bible.usccb.org/bible/readings/{DATE:%m%d%y}-Night.cfm"
+DAILY_READING_VIGIL_MASS_URL_FMT: Final[str] = "https://bible.usccb.org/bible/readings/{DATE:%m%d%y}-Vigil.cfm"
+DAILY_READING_YEAR_A_MASS_URL_FMT: Final[str] = "https://bible.usccb.org/bible/readings/{DATE:%m%d%y}-YearA.cfm"
+DAILY_READING_YEAR_B_MASS_URL_FMT: Final[str] = "https://bible.usccb.org/bible/readings/{DATE:%m%d%y}-YearB.cfm"
+DAILY_READING_YEAR_C_MASS_URL_FMT: Final[str] = "https://bible.usccb.org/bible/readings/{DATE:%m%d%y}-YearC.cfm"
 
 READING_CLOSE_REMARKS: Final[str] = "The word of the Lord."
 READING_CLOSE_RESPONSE: Final[str] = "Thanks be to God."

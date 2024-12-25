@@ -1,13 +1,88 @@
 from __future__ import annotations
 
-from enum import IntEnum, auto, unique
-from typing import TYPE_CHECKING, Any, NamedTuple
+import datetime
+from collections.abc import Iterable
+from enum import Enum, EnumMeta, IntEnum, auto, unique
+from typing import TYPE_CHECKING, Any, NamedTuple, cast
 
 from catholic_mass_readings import constants, utils
 
 if TYPE_CHECKING:
     import datetime
-    from collections.abc import Iterable
+
+
+class _CaseInsensitiveEnumMeta(EnumMeta):
+    def __call__(cls, value: str, *args: list[Any], **kwargs: Any) -> type[Enum]:  # noqa: ANN401
+        try:
+            return super().__call__(value, *args, **kwargs)
+        except ValueError:
+            items = cast(Iterable[Enum], cls)
+            for item in items:
+                if item.name.casefold() == value.casefold():
+                    return cast(type[Enum], item)
+            raise
+
+
+@unique
+class MassType(str, Enum, metaclass=_CaseInsensitiveEnumMeta):
+    DEFAULT = ""
+    DAWN = "DAWN"
+    DAY = "DAY"
+    NIGHT = "NIGHT"
+    VIGIL = "VIGIL"
+    YEARA = "YEARA"
+    YEARB = "YEARB"
+    YEARC = "YEARC"
+
+    def to_url(self, dt: datetime.date) -> str:
+        """
+        Generates a URL for the specified date.
+
+        Args:
+            dt (datetime.date): The mass date.
+
+        Returns:
+            str containing the url.
+
+        >>> MassType.DEFAULT.to_url(datetime.date(2025, 4, 6))
+        'https://bible.usccb.org/bible/readings/040625.cfm'
+        >>> MassType.DAWN.to_url(datetime.date(2025, 4, 6))
+        'https://bible.usccb.org/bible/readings/040625-Dawn.cfm'
+        >>> MassType.DAY.to_url(datetime.date(2025, 4, 6))
+        'https://bible.usccb.org/bible/readings/040625-Day.cfm'
+        >>> MassType.NIGHT.to_url(datetime.date(2025, 4, 6))
+        'https://bible.usccb.org/bible/readings/040625-Night.cfm'
+        >>> MassType.VIGIL.to_url(datetime.date(2025, 4, 6))
+        'https://bible.usccb.org/bible/readings/040625-Vigil.cfm'
+        >>> MassType.YEARA.to_url(datetime.date(2025, 4, 6))
+        'https://bible.usccb.org/bible/readings/040625-YearA.cfm'
+        >>> MassType.YEARB.to_url(datetime.date(2025, 4, 6))
+        'https://bible.usccb.org/bible/readings/040625-YearB.cfm'
+        >>> MassType.YEARC.to_url(datetime.date(2025, 4, 6))
+        'https://bible.usccb.org/bible/readings/040625-YearC.cfm'
+        """
+        return self._to_url_fmt().format(DATE=dt)
+
+    def _to_url_fmt(self) -> str:  # noqa: PLR0911
+        if self == MassType.DEFAULT:
+            return constants.DAILY_READING_DEFAULT_MSS_URL_FMT
+        if self == MassType.DAY:
+            return constants.DAILY_READING_DAY_MASS_URL_FMT
+        if self == MassType.DAWN:
+            return constants.DAILY_READING_DAWN_MASS_URL_FMT
+        if self == MassType.NIGHT:
+            return constants.DAILY_READING_NIGHT_MASS_URL_FMT
+        if self == MassType.VIGIL:
+            return constants.DAILY_READING_VIGIL_MASS_URL_FMT
+        if self == MassType.YEARA:
+            return constants.DAILY_READING_YEAR_A_MASS_URL_FMT
+        if self == MassType.YEARB:
+            return constants.DAILY_READING_YEAR_B_MASS_URL_FMT
+        if self == MassType.YEARC:
+            return constants.DAILY_READING_YEAR_C_MASS_URL_FMT
+
+        msg = f"Unsupported {self}"
+        raise ValueError(msg)
 
 
 @unique
@@ -207,6 +282,7 @@ class Section(NamedTuple):
 
 class Mass(NamedTuple):
     date: datetime.date | None
+    type_: MassType | str | None
     url: str
     title: str
     sections: list[Section]
@@ -239,4 +315,6 @@ class Mass(NamedTuple):
         r = {"url": self.url, "title": self.title, "sections": [s.to_dict() for s in self.sections]}
         if self.date:
             r["date"] = self.date.isoformat()
+        if self.type_:
+            r["type_"] = self.type_
         return r

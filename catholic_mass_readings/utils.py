@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import logging
 import re
 from collections import defaultdict
@@ -20,6 +21,7 @@ _BOOK_LINK_PATTERN: Final[re.Pattern] = re.compile(r"bible\/([^\/]+)")
 _ROMAN_NUMERAL_PATTERN: Final[re.Pattern] = re.compile(r"\s?([IVXLCDM]+)$", re.IGNORECASE)
 _NUMERAL_PATTERN: Final[re.Pattern] = re.compile(r"\s?([0-9]+)$", re.IGNORECASE)
 _ROMAN_VALUES: Final[dict[str, int]] = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+_URL_PATTERN: Final[re.Pattern] = re.compile(r"readings\/(?P<DATE>\d{6})-?(?P<TYPE>[A-Z]*)\.cfm$", re.IGNORECASE)
 
 
 def find_iter(parent: Tag, *, name: str | None = None, class_: str | None = None) -> Iterable[Tag]:
@@ -178,6 +180,44 @@ def lookup_book(key: str | None) -> dict[str, str] | None:
         return old_testament_book
 
     return new_testament_book
+
+
+def parse_url(url: str) -> tuple[datetime.date, str] | None:
+    """
+    Parses the url into datetime.date and str representing the type.
+
+    Args:
+        url (str): The url.
+
+    Returns:
+        tuple[datetime.date, str] or None if not parsed successfully.
+
+    >>> parse_url("https://bible.usccb.org/bible/readings/122525.cfm")
+    (datetime.date(2025, 12, 25), '')
+    >>> parse_url("https://bible.usccb.org/bible/readings/040625-YearA.cfm")
+    (datetime.date(2025, 4, 6), 'YearA')
+    >>> parse_url("https://bible.usccb.org/bible/readings/040625-YearB.cfm")
+    (datetime.date(2025, 4, 6), 'YearB')
+    >>> parse_url("https://bible.usccb.org/bible/readings/040625-YearC.cfm")
+    (datetime.date(2025, 4, 6), 'YearC')
+    >>> parse_url("https://bible.usccb.org/bible/readings/122525-Dawn.cfm")
+    (datetime.date(2025, 12, 25), 'Dawn')
+    >>> parse_url("https://bible.usccb.org/bible/readings/122525-Day.cfm")
+    (datetime.date(2025, 12, 25), 'Day')
+    >>> parse_url("https://bible.usccb.org/bible/readings/122525-Night.cfm")
+    (datetime.date(2025, 12, 25), 'Night')
+    >>> parse_url("https://bible.usccb.org/bible/readings/122525-Vigil.cfm")
+    (datetime.date(2025, 12, 25), 'Vigil')
+    >>> parse_url("https://bible.usccb.org/bible/readings/12252025.cfm")
+    >>> parse_url("https://bible.usccb.org/bible/foo/122525.cfm")
+    """
+    m = _URL_PATTERN.search(url)
+    if m is None:
+        return None
+
+    dt = datetime.datetime.strptime(m.groups()[0], constants.DATE_FMT).replace(tzinfo=constants.DEFAULT_TIMEZONE).date()
+    type_ = m.groups()[1]
+    return dt, type_
 
 
 @cache

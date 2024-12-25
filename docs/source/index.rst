@@ -48,44 +48,49 @@ The following example queries for the mass on a particular date:
     import asyncio
     import datetime
 
-    from catholic_mass_readings import USCCB
+    from catholic_mass_readings import USCCB, models
 
     async with USCCB() as usccb:
-        mass = await usccb.get_mass_from_date(datetime.date(2024, 12, 25))
-        print(mass.dumps())
+        mass = await usccb.get_mass(datetime.date(2024, 12, 25), models.MassType.VIGIL)
+        print(mass)
 
 The following example queries for a range of Sunday masses:
 
 .. code-block:: Python
     async with USCCB() as usccb:
         masses: list[models.Mass] = []
-        dates = usccb.get_sunday_mass_dates(datetime.date(2024, 12, 25), datetime.date(2024, 1, 25))
+        dates = usccb.get_sunday_mass_dates(datetime.date(2024, 12, 25), datetime.date(2025, 1, 25))
         for task in asyncio.as_completed([usccb.get_mass_from_date(dt) for dt in dates]):
             mass = await task
             if mass:
-                print(mass.dumps())
+                masses.append(mass)
 
         masses.sort(key=lambda m: m.date.toordinal() if m.date else -1)
-        print(mass.dumps())
+        for mass in masses:
+            end = "\n" if mass is masses[-1] else "\n\n"
+            print(mass, end=end)
+
 
 To query for a range of masses (step how you want to):
 
 .. code-block:: Python
     async with USCCB() as usccb:
         masses: list[models.Mass] = []
-        dates = usccb.get_mass_dates(datetime.date(2024, 12, 25), datetime.date(2024, 1, 25), step=datetime.timedelta(days=1))
+        dates = usccb.get_mass_dates(datetime.date(2024, 12, 25), datetime.date(2025, 1, 25), step=datetime.timedelta(days=1))
         for task in asyncio.as_completed([usccb.get_mass_from_date(dt) for dt in dates]):
             mass = await task
             if mass:
-                print(mass.dumps())
+                masses.append(mass)
 
         masses.sort(key=lambda m: m.date.toordinal() if m.date else -1)
-        print(mass.dumps())
+        for mass in masses:
+            end = "\n" if mass is masses[-1] else "\n\n"
+            print(mass, end=end)
 
 .. code-block:: bash
 
     # To get a mass for a particular date:
-    python -m catholic_mass_readings get-mass --date 2024-12-25
+    python -m catholic_mass_readings get-mass --date 2024-12-25 --type vigil
 
     # To query for a range of Sunday masses:
     python -m catholic_mass_readings get-sunday-mass-range --start 2024-12-25 --end 2025-01-01
@@ -96,7 +101,7 @@ To query for a range of masses (step how you want to):
     # or saving to a file...
 
     # To get a mass for a particular date:
-    python -m catholic_mass_readings get-mass --date 2024-12-25 --save mass.json
+    python -m catholic_mass_readings get-mass --date 2024-12-25 --type vigil --save mass.json
 
     # To query for a range of Sunday masses:
     python -m catholic_mass_readings get-sunday-mass-range --start 2024-12-25 --end 2025-01-01 --save mass.json
