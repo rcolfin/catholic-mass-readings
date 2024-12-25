@@ -34,6 +34,9 @@ class MassType(str, Enum, metaclass=_CaseInsensitiveEnumMeta):
     YEARB = "YEARB"
     YEARC = "YEARC"
 
+    def __repr__(self) -> str:
+        return self.name
+
     def to_url(self, dt: datetime.date) -> str:
         """
         Generates a URL for the specified date.

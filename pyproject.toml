@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "catholic-mass-readings"
-version = "0.4.0"
+version = "0.4.1"
 description = "Provides an API for scraping the web page from https://bible.usccb.org/bible/readings/ to get the readings"
 authors = ["Robert Colfin <robert.m.colfin@gmail.com>"]
 readme = "README.md"
