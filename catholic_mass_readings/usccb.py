@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import datetime
+import html
 import logging
 from typing import TYPE_CHECKING, Final, cast
 
@@ -271,7 +272,7 @@ class USCCB:
 
     @staticmethod
     def _clean_text(string: str) -> str:
-        return string.replace("\xa0", " ")
+        return html.unescape(string.replace("\xa0", " "))
 
     def _ensure_session(self) -> aiohttp.ClientSession:
         if self._session is None:
