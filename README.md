@@ -37,13 +37,10 @@ async with USCCB() as usccb:
 
 # To query for a range of Sunday masses:
 async with USCCB() as usccb:
-    masses: list[models.Mass] = []
     dates = usccb.get_sunday_mass_dates(datetime.date(2024, 12, 25), datetime.date(2025, 1, 25))
-    for task in asyncio.as_completed([usccb.get_mass_from_date(dt) for dt in dates]):
-        mass = await task
-        if mass:
-            masses.append(mass)
-
+    tasks = [usccb.get_mass_from_date(dt, types) for dt in dates]
+    responses = await asyncio.gather(*tasks)
+    masses = [m for m in responses if m]
     masses.sort(key=lambda m: m.date.toordinal() if m.date else -1)
     for mass in masses:
         end = "\n" if mass is masses[-1] else "\n\n"
@@ -51,17 +48,20 @@ async with USCCB() as usccb:
 
 # To query for a range of masses (step how you want to):
 async with USCCB() as usccb:
-    masses: list[models.Mass] = []
     dates = usccb.get_mass_dates(datetime.date(2024, 12, 25), datetime.date(2025, 1, 25), step=datetime.timedelta(days=1))
-    for task in asyncio.as_completed([usccb.get_mass_from_date(dt) for dt in dates]):
-        mass = await task
-        if mass:
-            masses.append(mass)
-
+    tasks = [usccb.get_mass_from_date(dt) for dt in dates]
+    responses = await asyncio.gather(*tasks)
+    masses = [m for m in responses if m]
     masses.sort(key=lambda m: m.date.toordinal() if m.date else -1)
     for mass in masses:
         end = "\n" if mass is masses[-1] else "\n\n"
         print(mass, end=end)
+
+# To query for a list of all the mass types on a particular date:
+async with USCCB() as usccb:
+    mass_types = await usccb.get_mass_types(datetime.date(2024, 12, 25))
+    for mass_type in mass_types:
+        print(mass_type.name)
 ```
 
 As a CLI
@@ -75,6 +75,9 @@ python -m catholic_mass_readings get-sunday-mass-range --start 2024-12-25 --end 
 
 # To query for a range of masses (step how you want to):
 python -m catholic_mass_readings get-mass-range --start 2024-12-25 --end 2025-01-01 --step 7
+
+# To query for a list of mass types on a particular date:
+python -m catholic_mass_readings get-mass-types --date 2025-12-25
 
 # or saving to a file...
 

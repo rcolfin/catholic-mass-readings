@@ -56,6 +56,15 @@ async def get_readings(date: datetime.date, types: list[models.MassType] | None,
             await f.write(json.dumps(mass.to_dict(), indent=4, sort_keys=True))
 
 
+@cli.command("get-mass-types")
+@click.option("--date", type=click.DateTime([_DATE_TIME_FMT]), default=_TODAY)
+async def get_mass_types(date: datetime.date) -> None:
+    async with USCCB() as usccb:
+        mass_types = await usccb.get_mass_types(date)
+    for mass_type in mass_types:
+        print(mass_type.name)  # noqa: T201
+
+
 @cli.command("get-mass-range")
 @click.option("-s", "--start", type=click.DateTime([_DATE_TIME_FMT]), default=_TODAY)
 @click.option("-e", "--end", type=click.DateTime([_DATE_TIME_FMT]), default=_WEEK_LATER)
@@ -101,12 +110,9 @@ async def _get_readings_range(
     dates: Iterable[datetime.date], types: list[models.MassType] | None, save: str | None
 ) -> None:
     async with USCCB() as usccb:
-        masses: list[models.Mass] = []
-        for task in asyncio.as_completed([usccb.get_mass_from_date(dt, types) for dt in dates]):
-            mass = await task
-            if mass:
-                masses.append(mass)
-
+        tasks = [usccb.get_mass_from_date(dt, types) for dt in dates]
+        responses = await asyncio.gather(*tasks)
+        masses = [m for m in responses if m]
         masses.sort(key=lambda m: m.date.toordinal() if m.date else -1)
 
     for mass in masses:

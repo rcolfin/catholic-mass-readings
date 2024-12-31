@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import contextlib
 import datetime
 import html
@@ -164,6 +165,23 @@ class USCCB:
                 type_ = models.MassType(type_)
 
         return await self._get_mass(url, date, type_)
+
+    async def get_mass_types(self, date: datetime.date) -> list[models.MassType]:
+        """
+        Gets the list of mass types for the specified date.
+
+        Args:
+            date (datetime.date): The mass date.
+
+        Returns:
+            list[models.MassType] for each of the supported mass types.
+        """
+        session = self._ensure_session()
+        urls_to_type = {type_.to_url(date): type_ for type_ in models.MassType}
+        requests = [session.head(url) for url in urls_to_type]
+        responses = await asyncio.gather(*requests)
+        ok_responses = (r for r in responses if r.ok)
+        return sorted(urls_to_type[str(r.request_info.url)] for r in ok_responses)
 
     async def _get_mass(
         self, url: str, date: datetime.date | None, type_: models.MassType | str | None
