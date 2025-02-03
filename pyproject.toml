@@ -27,7 +27,7 @@ aiofiles = "^24.1.0"
 aiohttp = "^3.11.11"
 asyncclick = "^8.1.7.2"
 html5lib = "^1.1"
-pytz = "^2024.2"
+pytz = ">=2024.2,<2026.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.11.2"
