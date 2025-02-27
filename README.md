@@ -3,7 +3,7 @@
 [![CI Build](https://github.com/rcolfin/catholic-mass-readings/actions/workflows/ci.yml/badge.svg)](https://github.com/rcolfin/catholic-mass-readings/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/rcolfin/catholic-mass-readings.svg)](https://github.com/rcolfin/catholic-mass-readings/blob/main/LICENSE)
 [![PyPI Version](https://img.shields.io/pypi/v/catholic-mass-readings)](https://pypi.python.org/pypi/catholic-mass-readings)
-[![versions](https://img.shields.io/pypi/pyversions/catholic-mass-readings.svg)](ttps://github.com/rcolfin/catholic-mass-readings)
+[![versions](https://img.shields.io/pypi/pyversions/catholic-mass-readings.svg)](https://github.com/rcolfin/catholic-mass-readings)
 
 Provides an API for scraping the web page from [Daily Readings](https://bible.usccb.org/bible/readings/) website of United States Conference of Catholic Bishops.
 

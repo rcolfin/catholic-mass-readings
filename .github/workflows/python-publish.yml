@@ -57,7 +57,7 @@ jobs:
 
     - name: Install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: poetry install --no-interaction --no-root --no-dev
+      run: poetry install --no-interaction --no-root --only main
 
     - name: Install project
       run: poetry install --no-interaction
