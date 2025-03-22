@@ -11,38 +11,48 @@ permissions:
     contents: write
 jobs:
   docs:
-    runs-on: ubuntu-latest
     if: github.event_name == 'push' || !github.event.pull_request.draft
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9"]
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-      - name: Set up python
+
+      - name: Set up Python
         id: setup-python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        id: setup-uv
+        uses: astral-sh/setup-uv@v5
         with:
-          version: 1.8.3
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-          installer-parallel: true
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v4
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-      - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
-      - name: Install project
-        run: poetry install --no-interaction
+          version: latest
+          python-version: ${{ matrix.python-version }}
+          cache-suffix:  ${{ matrix.python-version }}
+
+      - name: Setup Test Results
+        run: |
+          mkdir -p ${{ github.workspace }}/build/coverage
+          mkdir -p ${{ github.workspace }}/build/test-results
+
+      - name: Run tests and collect coverage
+        run: |
+          set -euox pipefail
+          PACKAGE=$(echo "$(basename $PWD)" | tr "-" "_")
+          [ -d "${PACKAGE}" ] || PACKAGE="."
+          uv run --frozen pytest --cov-report=xml:${{ github.workspace }}/build/coverage/coverage.xml --cov="${PACKAGE}" --junitxml=${{ github.workspace }}/build/test-results/tests.xml
+
       - name: Sphinx build
         run: |
-          source .venv/bin/activate
-          sphinx-build docs/source _build
+          uv run --frozen sphinx-build docs/source _build
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}

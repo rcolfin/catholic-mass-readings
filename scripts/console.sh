@@ -3,7 +3,7 @@
 SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 SCRIPT=$(cat <<EOF
-source "${SCRIPT_PATH}/setup-python.sh"
+source "${SCRIPT_PATH}/setup-uv.sh"
 [ "$#" -gt 0 ] && exec $@
 EOF
 )

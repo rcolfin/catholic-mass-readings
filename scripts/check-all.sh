@@ -2,22 +2,24 @@
 
 # Checks all the Python packages.
 
+set -euo pipefail
+
 SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 SCRIPT_NAME=$( basename "${BASH_SOURCE[0]}" )
 PYTHON_ROOT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )
 
-if ! command -v "poetry" &> /dev/null; then
+if ! command -v "uv" &> /dev/null; then
     exec "${SCRIPT_PATH}/console.sh" "${SCRIPT_PATH}/${SCRIPT_NAME}"
 fi
 
 # shellcheck disable=SC2207
-PACKAGE_PATHS=($(find "${PYTHON_ROOT_PATH}" -name "pyproject.toml" -exec dirname {} \;))
+PACKAGE_PATHS=$(find "${PYTHON_ROOT_PATH}" -maxdepth 2 -name "pyproject.toml" -not -path '*.venv*' -exec dirname {} \;)
 FAILED=()
 
-for PACKAGE_PATH in "${PACKAGE_PATHS[@]}"; do
+for PACKAGE_PATH in ${PACKAGE_PATHS}; do
     PACKAGE_NAME=$(basename "${PACKAGE_PATH}")
     pushd "${PACKAGE_PATH}" >/dev/null ||  { FAILED+=("${PACKAGE_NAME}"); continue; }
-    poetry run "${SCRIPT_PATH}/check.sh" || { FAILED+=("${PACKAGE_NAME}"); }
+    uv run --frozen "${SCRIPT_PATH}/check.sh" || { FAILED+=("${PACKAGE_NAME}"); }
     popd >/dev/null || { continue; }
 done
 

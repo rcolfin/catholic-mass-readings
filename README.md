@@ -11,7 +11,13 @@ Provides an API for scraping the web page from [Daily Readings](https://bible.us
 
 ### Setup Python Environment:
 
-Run [scripts/console.sh](../scripts/console.sh) poetry install
+Run [scripts/console.sh](../scripts/console.sh) uv install
+
+The first time run
+
+```sh
+uvx pre-commit install
+```
 
 ### If you need to relock:
 
@@ -19,7 +25,7 @@ Run [scripts/lock.sh](../scripts/lock.sh)
 
 ### Run code
 
-Run [scripts/console.sh](../scripts/console.sh) poetry run python -m catholic_mass_readings
+Run [scripts/console.sh](../scripts/console.sh) uv run python -m catholic_mass_readings
 
 
 ## API Usage:
