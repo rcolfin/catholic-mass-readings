@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Final, cast
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-from bs4.element import Tag
+    from bs4.element import Tag
 
 from catholic_mass_readings import constants
 
@@ -27,7 +27,7 @@ _URL_PATTERN: Final[re.Pattern] = re.compile(r"readings\/(?P<DATE>\d{6})-?(?P<TY
 def find_iter(parent: Tag, *, name: str | None = None, class_: str | None = None) -> Iterable[Tag]:
     container = parent.find(name=name, class_=class_)
     while container:
-        yield cast(Tag, container)
+        yield cast("Tag", container)
         container = container.find_next(name=name, class_=class_)
 
 

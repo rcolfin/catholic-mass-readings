@@ -14,7 +14,7 @@ function run_cmd() {
     fi
 }
 
-if ! command -v "poetry" &> /dev/null; then
+if ! command -v "uv" &> /dev/null; then
     # shellcheck disable=SC2164
     cd "${WORKING_PATH}" >/dev/null 2>&1
     exec "${SCRIPT_PATH}/console.sh" "${SCRIPT_PATH}/${SCRIPT_NAME}"

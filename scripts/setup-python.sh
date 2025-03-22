@@ -4,7 +4,7 @@ SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 SCRIPT_NAME=$(basename "${BASH_SOURCE[0]}")
 BASH_SCRIPT_SOURCED=false
 [[ "${BASH_SOURCE[0]}" != "${0}" ]] && BASH_SCRIPT_SOURCED=true
-PACKAGES=(poetry pre-commit)
+PACKAGES=(uv pre-commit)
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 function log() {

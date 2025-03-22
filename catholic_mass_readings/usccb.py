@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING, Final, cast
 
 import aiohttp
 from bs4 import BeautifulSoup
-from bs4.element import Tag
 from typing_extensions import Self
 
 from catholic_mass_readings import constants, models, utils
@@ -17,6 +16,8 @@ from catholic_mass_readings import constants, models, utils
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from types import TracebackType
+
+    from bs4.element import Tag
 
 logger = logging.getLogger(__name__)
 
@@ -192,7 +193,7 @@ class USCCB:
 
         logger.debug("Parsing content from url: %s", url)
         soup = BeautifulSoup(content, "html5lib")
-        title = cast(Tag, soup.find("title"))
+        title = cast("Tag", soup.find("title"))
         sections: list[models.Section] = self._get_sections(soup)
         return models.Mass(date, type_, url, title.get_text(strip=True).split("|")[0].strip(), sections)
 
@@ -202,7 +203,7 @@ class USCCB:
         prev_expects_children = False
         for container in utils.find_iter(soup, class_="container"):
             name = container.findChild(class_="name")
-            address = cast(Tag, container.findChild(class_="address"))
+            address = cast("Tag", container.findChild(class_="address"))
             if not name or not address:
                 continue
 
@@ -245,13 +246,13 @@ class USCCB:
     def _create_verse(self, a: Tag) -> models.Verse:
         """Creates a verse from the specified Tag."""
         text = self._clean_text(a.get_text(strip=True))
-        link = cast(str, a["href"]).strip()
+        link = cast("str", a["href"]).strip()
         book_dict = utils.get_book_from_verse(link, text)
         book = book_dict["name"] if book_dict else None
         return models.Verse(text, link, book)
 
     def _get_readings(self, container: Tag, verses: list[models.Verse]) -> Iterable[models.Reading]:
-        content_body = cast(Tag, container.findChild(class_="content-body"))
+        content_body = cast("Tag", container.findChild(class_="content-body"))
         empty = True
         for v, lines in self._get_raw_readings(content_body, verses):
             text = self._clean_text("".join(lines)).strip()
