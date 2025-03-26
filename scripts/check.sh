@@ -8,9 +8,9 @@ function run_cmd() {
     local CMD="$1"
     shift 1
 
-    if command -v "$CMD" &> /dev/null; then
-        echo "$CMD" "$@"
-        "$CMD" "$@"
+    if uv run --frozen which "$CMD" &> /dev/null; then
+        echo uv run --frozen "$CMD" "$@"
+        uv run --frozen "$CMD" "$@"
     fi
 }
 

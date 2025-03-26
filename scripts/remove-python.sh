@@ -20,8 +20,9 @@ function log() {
 
 set -euo pipefail
 
-VENV_PATHS=$(find "${PYTHON_ROOT_PATH}" -name ".venv" -prune)
-PATHS_TO_REMOVE=("${PATHS_TO_REMOVE[@]}" "${VENV_PATHS}")
+VENV_PATHS=$(find "${PYTHON_ROOT_PATH}" -name ".venv" -prune | tr '\n' ' ')
+IFS=' ' read -ra VENV_PATHS_TO_REMOVE <<< "$VENV_PATHS"
+PATHS_TO_REMOVE+=("${VENV_PATHS_TO_REMOVE[@]}")
 
 for PATH_TO_REMOVE in "${PATHS_TO_REMOVE[@]}"
 do
