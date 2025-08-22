@@ -5,11 +5,49 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Module",
+            "name": "Debug get-mass-range",
             "type": "debugpy",
             "request": "launch",
             "module": "catholic_mass_readings",
-            "args": ["get-mass-range", "--start", "2024-12-18", "--end", "2025-01-01", "--step", "1"]
+            "args": [
+                "get-mass-range",
+                "--start",
+                "2024-12-18",
+                "--end",
+                "2025-01-01",
+                "--step",
+                "1"
+            ]
+        },
+        {
+            "name": "Debug get-mass (single readings)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "catholic_mass_readings",
+            "args": [
+                "get-mass",
+                "--date",
+                "2025-08-06",
+                "-t",
+                "DEFAULT",
+                "--save",
+                "tests/data/mass-single-reading.json"
+            ]
+        },
+        {
+            "name": "Debug get-mass (multiple readings)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "catholic_mass_readings",
+            "args": [
+                "get-mass",
+                "--date",
+                "2025-08-10",
+                "-t",
+                "DEFAULT",
+                "--save",
+                "tests/data/mass-multiple-readings.json"
+            ]
         }
     ]
 }
