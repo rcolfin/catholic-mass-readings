@@ -40,9 +40,9 @@ def _get_mass_types(ctx: click.Context, param: click.Option, value: tuple[str, .
     callback=_get_mass_types,
 )
 @click.option("--save", type=click.Path(dir_okay=False, writable=True))
-async def get_readings(date: datetime.date, types: list[models.MassType] | None, save: str | None) -> None:
+async def get_readings(date: datetime.datetime, types: list[models.MassType] | None, save: str | None) -> None:
     async with USCCB() as usccb:
-        mass = await usccb.get_mass_from_date(date, types)
+        mass = await usccb.get_mass_from_date(date.date(), types)
         if not mass:
             logger.error("Failed to retrieve mass for %s", date)
             return
@@ -58,9 +58,9 @@ async def get_readings(date: datetime.date, types: list[models.MassType] | None,
 
 @cli.command("get-mass-types")
 @click.option("--date", type=click.DateTime([_DATE_TIME_FMT]), default=_TODAY)
-async def get_mass_types(date: datetime.date) -> None:
+async def get_mass_types(date: datetime.datetime) -> None:
     async with USCCB() as usccb:
-        mass_types = await usccb.get_mass_types(date)
+        mass_types = await usccb.get_mass_types(date.date())
     for mass_type in mass_types:
         print(mass_type.name)  # noqa: T201
 

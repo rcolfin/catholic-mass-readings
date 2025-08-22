@@ -7,12 +7,11 @@ from typing import TYPE_CHECKING, Any, NamedTuple, cast
 from catholic_mass_readings import constants, utils
 
 if TYPE_CHECKING:
-    import datetime
     from collections.abc import Iterable
 
 
 class _CaseInsensitiveEnumMeta(EnumMeta):
-    def __call__(cls, value: str, *args: list[Any], **kwargs: Any) -> type[Enum]:  # noqa: ANN401
+    def __call__(cls, value: str, *args: Any, **kwargs: Any):  # type: ignore # noqa: ANN401 ANN204 PGH003
         try:
             return super().__call__(value, *args, **kwargs)
         except ValueError:
@@ -245,7 +244,7 @@ class Section(NamedTuple):
             str representation of the section.
         """
         lines = (reading.format(self) for reading in self.readings)
-        return "\n".join(lines)
+        return "\n\n".join(lines)
 
     @property
     def display_header(self) -> str:
@@ -315,9 +314,10 @@ class Mass(NamedTuple):
 
     def to_dict(self) -> dict[str, Any]:
         """Returns a dictionary representation."""
-        r = {"url": self.url, "title": self.title, "sections": [s.to_dict() for s in self.sections]}
+        r: dict[str, Any] = {"url": self.url, "title": self.title, "sections": [s.to_dict() for s in self.sections]}
         if self.date:
-            r["date"] = self.date.isoformat()
+            date = self.date.date() if isinstance(self.date, datetime.datetime) else self.date
+            r["date"] = date.isoformat()
         if self.type_:
             r["type_"] = self.type_
         return r
