@@ -7,8 +7,8 @@ import html
 import logging
 from typing import TYPE_CHECKING, Final, cast
 
-import aiohttp
 from bs4 import BeautifulSoup
+from curl_cffi import requests
 from typing_extensions import Self
 
 from catholic_mass_readings import constants, models, utils
@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from types import TracebackType
 
     from bs4.element import Tag
+    from requests.models import Request
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ class USCCB:
     """Default list of MassTypes to try when searching for a mass on a given mass date."""
 
     def __init__(self) -> None:
-        self._session: aiohttp.ClientSession | None = None
+        self._session: requests.AsyncSession | None = None
 
     async def __aenter__(self) -> Self:
         return self
@@ -148,7 +149,7 @@ class USCCB:
 
         for type_ in types:
             url = type_.to_url(date)
-            with contextlib.suppress(aiohttp.ClientResponseError):
+            with contextlib.suppress(requests.exceptions.RequestException):
                 return await self._get_mass(url, date, type_)
 
         logger.warning("No mass for date: %s, types: %s", date, types)
@@ -182,14 +183,19 @@ class USCCB:
         requests = [session.head(url) for url in urls_to_type]
         responses = await asyncio.gather(*requests)
         ok_responses = (r for r in responses if r.ok)
-        return sorted(urls_to_type[str(r.request_info.url)] for r in ok_responses)
+        return sorted(urls_to_type[str(cast("Request", r.request).url)] for r in ok_responses)
 
     async def _get_mass(
         self, url: str, date: datetime.date | None, type_: models.MassType | str | None
     ) -> models.Mass | None:
         logger.debug("Querying url: %s", url)
-        async with self._ensure_session().get(url, raise_for_status=True) as r:
-            content = await r.text()
+        try:
+            r = await self._ensure_session().get(url)
+            r.raise_for_status()
+            content = r.text
+        except Exception:
+            logger.debug("Failed to get mass from url: %s", url, exc_info=True)
+            raise
 
         logger.debug("Parsing content from url: %s", url)
         soup = BeautifulSoup(content, "html5lib")
@@ -202,8 +208,8 @@ class USCCB:
         sections: list[models.Section] = []
         prev_expects_children = False
         for container in utils.find_iter(soup, class_="container"):
-            name = container.findChild(class_="name")
-            address = cast("Tag", container.findChild(class_="address"))
+            name = container.find(class_="name")
+            address = cast("Tag", container.find(class_="address"))
             if not name or not address:
                 continue
 
@@ -215,6 +221,7 @@ class USCCB:
             type_ = models.SectionType.from_header(header)
 
             section: models.Section | None = None
+            expects_children = False
             for reading in self._get_readings(container, verses):
                 if section is None:
                     if m := constants.OR_PATTERN.match(reading.text):
@@ -241,7 +248,7 @@ class USCCB:
 
     def _get_verses(self, parent: Tag) -> list[models.Verse]:
         """Gets the verses"""
-        return list(map(self._create_verse, parent.findChildren(name="a", href=True)))
+        return list(map(self._create_verse, parent.find_all(name="a", href=True)))
 
     def _create_verse(self, a: Tag) -> models.Verse:
         """Creates a verse from the specified Tag."""
@@ -252,7 +259,7 @@ class USCCB:
         return models.Verse(text, link, book)
 
     def _get_readings(self, container: Tag, verses: list[models.Verse]) -> Iterable[models.Reading]:
-        content_body = cast("Tag", container.findChild(class_="content-body"))
+        content_body = cast("Tag", container.find(class_="content-body"))
         empty = True
         for v, lines in self._get_raw_readings(content_body, verses):
             text = self._clean_text("".join(lines)).strip()
@@ -270,7 +277,8 @@ class USCCB:
         paragraph: Tag
         for paragraph in content_body.find_all("p"):
             txt = paragraph.get_text(
-                strip=False,
+                strip=True,
+                separator="\n",
             )
             if constants.OR_PATTERN.match(txt.strip()):
                 yield (verses, lines)
@@ -293,12 +301,10 @@ class USCCB:
     def _clean_text(string: str) -> str:
         return html.unescape(string.replace("\xa0", " "))
 
-    def _ensure_session(self) -> aiohttp.ClientSession:
+    def _ensure_session(self) -> requests.AsyncSession:
         if self._session is None:
             self._session = self._create_session()
         return self._session
 
-    def _create_session(self) -> aiohttp.ClientSession:
-        return aiohttp.ClientSession(
-            headers={"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
-        )
+    def _create_session(self) -> requests.AsyncSession:
+        return requests.AsyncSession(impersonate="chrome110")
