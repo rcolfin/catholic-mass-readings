@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from types import TracebackType
 
     from bs4.element import Tag
-    from requests.models import Request
+    from curl_cffi.requests.models import Request
 
 logger = logging.getLogger(__name__)
 
