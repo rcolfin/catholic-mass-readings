@@ -50,8 +50,7 @@ dev = [
     "types-beautifulsoup4<5.0.0.0,>=4.12.0.20240907",
     "types-pytz<2026.0.0.0,>=2024.2.0.20241003",
     "sphinx-material<1.0.0,>=0.0.36",
-    "pytest-asyncio>=1.1.0",
-    "types-requests>=2.32.4.20250809",
+    "pytest-asyncio>=1.1.0"
 ]
 
 [tool.pytest.ini_options]
