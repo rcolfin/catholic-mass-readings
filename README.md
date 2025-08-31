@@ -7,26 +7,20 @@
 
 Provides an API for scraping the web page from [Daily Readings](https://bible.usccb.org/bible/readings/) website of United States Conference of Catholic Bishops.
 
-## Development
+## About catholic-mass-readings
 
-### Setup Python Environment:
+This package was built to facilitate pulling the mass readings used as the description when scheduling the YouTube live stream. I'm happy if others want to use it.
+Please open new issues for any bugs you find, support is greatly appreciated!  If you have a new feature, feel free to open a pull request.
 
-Run [scripts/console.sh](../scripts/console.sh) uv install
+## Installation
 
-The first time run
+To install [catholic-mass-readings](https://pypi.org/project/catholic-mass-readings/) from PyPI, use the following command:
 
-```sh
-uvx pre-commit install
-```
+    $ pip install catholic-mass-readings
 
-### If you need to relock:
+You can also clone the repo and run the following command in the project root to install the source code as editable:
 
-Run [scripts/lock.sh](../scripts/lock.sh)
-
-### Run code
-
-Run [scripts/console.sh](../scripts/console.sh) uv run python -m catholic_mass_readings
-
+    $ pip install -e .
 
 ## API Usage:
 
@@ -97,15 +91,25 @@ python -m catholic_mass_readings get-sunday-mass-range --start 2024-12-25 --end 
 python -m catholic_mass_readings get-mass-range --start 2024-12-25 --end 2025-01-01 --step 7 --save mass.json
 ```
 
-## Installation
-
-To install catholic-mass-readings from PyPI, use the following command:
-
-    $ pip install catholic-mass-readings
-
-You can also clone the repo and run the following command in the project root to install the source code as editable:
-
-    $ pip install -e .
-
 ## Documentation
 The documentation for `catholic-mass-readings` can be found [here](https://rcolfin.github.io/catholic-mass-readings/) or in the project's docstrings.
+
+## Development
+
+### Setup Python Environment:
+
+Run [scripts/console.sh](../scripts/console.sh) uv install
+
+The first time run
+
+```sh
+uvx pre-commit install
+```
+
+### If you need to relock:
+
+Run [scripts/lock.sh](../scripts/lock.sh)
+
+### Run code
+
+Run [scripts/console.sh](../scripts/console.sh) uv run python -m catholic_mass_readings
