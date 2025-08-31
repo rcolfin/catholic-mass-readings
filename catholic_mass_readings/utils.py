@@ -4,7 +4,7 @@ import datetime
 import logging
 import re
 from collections import defaultdict
-from functools import cache
+from functools import lru_cache
 from typing import TYPE_CHECKING, Final, cast
 
 if TYPE_CHECKING:
@@ -16,12 +16,12 @@ from catholic_mass_readings import constants
 
 logger = logging.getLogger(__name__)
 
-_ABBREVIATED_BOOK_PATTERN: Final[re.Pattern] = re.compile(r"([0-9]?\s?[A-Z][a-z]*):?")
-_BOOK_LINK_PATTERN: Final[re.Pattern] = re.compile(r"bible\/([^\/]+)")
-_ROMAN_NUMERAL_PATTERN: Final[re.Pattern] = re.compile(r"\s?([IVXLCDM]+)$", re.IGNORECASE)
-_NUMERAL_PATTERN: Final[re.Pattern] = re.compile(r"\s?([0-9]+)$", re.IGNORECASE)
+_ABBREVIATED_BOOK_PATTERN: Final[re.Pattern[str]] = re.compile(r"([0-9]?\s?[A-Z][a-z]*):?")
+_BOOK_LINK_PATTERN: Final[re.Pattern[str]] = re.compile(r"bible\/([^\/]+)")
+_ROMAN_NUMERAL_PATTERN: Final[re.Pattern[str]] = re.compile(r"\s?([IVXLCDM]+)$", re.IGNORECASE)
+_NUMERAL_PATTERN: Final[re.Pattern[str]] = re.compile(r"\s?([0-9]+)$", re.IGNORECASE)
 _ROMAN_VALUES: Final[dict[str, int]] = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
-_URL_PATTERN: Final[re.Pattern] = re.compile(r"readings\/(?P<DATE>\d{6})-?(?P<TYPE>[A-Z]*)\.cfm$", re.IGNORECASE)
+_URL_PATTERN: Final[re.Pattern[str]] = re.compile(r"readings\/(?P<DATE>\d{6})-?(?P<TYPE>[A-Z]*)\.cfm$", re.IGNORECASE)
 
 
 def find_iter(parent: Tag, *, name: str | None = None, class_: str | None = None) -> Iterable[Tag]:
@@ -220,13 +220,13 @@ def parse_url(url: str) -> tuple[datetime.date, str] | None:
     return dt, type_
 
 
-@cache
+@lru_cache(maxsize=None)
 def _get_old_testament_book_lookup() -> dict[str, dict[str, str]]:
     """Returns a dict for looking up by both short and long abbreviations in the Old Testament books."""
     return _get_testament_book_lookup(constants.OLD_TESTAMENT_BOOKS)
 
 
-@cache
+@lru_cache(maxsize=None)
 def _get_new_testament_book_lookup() -> dict[str, dict[str, str]]:
     """Returns a dict for looking up by both short and long abbreviations in the New Testament books."""
     return _get_testament_book_lookup(constants.NEW_TESTAMENT_BOOKS)

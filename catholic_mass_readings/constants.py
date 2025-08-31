@@ -1,8 +1,12 @@
-import datetime
+from __future__ import annotations
+
 import re
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 import pytz
+
+if TYPE_CHECKING:
+    import datetime
 
 SUNDAY_DAY_OF_WEEK: Final[int] = 6
 
