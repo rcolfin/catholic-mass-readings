@@ -4,7 +4,7 @@ SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 SCRIPT_NAME=$(basename "${BASH_SOURCE[0]}")
 BASH_SCRIPT_SOURCED=false
 [[ "${BASH_SOURCE[0]}" != "${0}" ]] && BASH_SCRIPT_SOURCED=true
-PYTHON_VERSION=3.13
+PYTHON_VERSION=3.14
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 function log() {
