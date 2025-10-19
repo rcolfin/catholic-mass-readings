@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING, Final, cast
 
 from bs4 import BeautifulSoup
 from curl_cffi import requests
-from typing_extensions import Self
 
 from catholic_mass_readings import constants, models, utils
 
@@ -38,7 +37,7 @@ class USCCB:
     def __init__(self) -> None:
         self._session: requests.AsyncSession | None = None
 
-    async def __aenter__(self) -> Self:
+    async def __aenter__(self):
         return self
 
     async def __aexit__(
@@ -50,7 +49,7 @@ class USCCB:
         await self.close()
         return False
 
-    async def close(self) -> Self:
+    async def close(self) -> USCCB:
         """Closes the underlying connection."""
         if self._session is None:
             return self
