@@ -220,13 +220,13 @@ def parse_url(url: str) -> tuple[datetime.date, str] | None:
     return dt, type_
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=1)
 def _get_old_testament_book_lookup() -> dict[str, dict[str, str]]:
     """Returns a dict for looking up by both short and long abbreviations in the Old Testament books."""
     return _get_testament_book_lookup(constants.OLD_TESTAMENT_BOOKS)
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=1)
 def _get_new_testament_book_lookup() -> dict[str, dict[str, str]]:
     """Returns a dict for looking up by both short and long abbreviations in the New Testament books."""
     return _get_testament_book_lookup(constants.NEW_TESTAMENT_BOOKS)

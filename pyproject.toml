@@ -19,6 +19,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 keywords = [
     "catholic",
@@ -37,6 +38,7 @@ dependencies = [
     "asyncclick<9.0.0.0,>=8.1.7.2",
     "html5lib<2.0,>=1.1",
     "pytz<2026.0,>=2024.2",
+    "anyio>=4.5.2",
 ]
 
 [dependency-groups]
@@ -142,6 +144,7 @@ select = [
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
 unfixable = []
+ignore = ["ANN204", "ANN401"]
 # The fixes in extend-unsafe-fixes will require
 # provide the `--unsafe-fixes` flag when fixing.
 extend-unsafe-fixes = [

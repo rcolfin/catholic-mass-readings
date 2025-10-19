@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import json
 from pathlib import Path
@@ -11,13 +13,13 @@ from catholic_mass_readings import USCCB, models
 DATA_PATH: Final[Path] = Path(__file__).parent / "data"
 
 
-def _setup_mock(monkeypatch: Any, html_path: Path) -> None:  # noqa: ANN401
+def _setup_mock(monkeypatch: Any, html_path: Path) -> None:
     class MockResponse:
         def __init__(self, text: str) -> None:
             self.text = text
             self.status_code = 200
 
-        def raise_for_status(self: "MockResponse") -> None:
+        def raise_for_status(self: MockResponse) -> None:
             pass
 
     async def mock_async_get(self: requests.AsyncSession, url: str) -> MockResponse:
@@ -27,7 +29,7 @@ def _setup_mock(monkeypatch: Any, html_path: Path) -> None:  # noqa: ANN401
     monkeypatch.setattr(requests.AsyncSession, "get", mock_async_get)
 
 
-async def _test_mass_parse(monkeypatch: Any, html_path: Path, mass_json_path: Path) -> None:  # noqa: ANN401
+async def _test_mass_parse(monkeypatch: Any, html_path: Path, mass_json_path: Path) -> None:
     expected_mass_json = json.loads(mass_json_path.read_text(encoding="utf-8"))
     _setup_mock(monkeypatch, html_path)
     async with USCCB() as usccb:
@@ -38,7 +40,7 @@ async def _test_mass_parse(monkeypatch: Any, html_path: Path, mass_json_path: Pa
 
 
 @pytest.mark.asyncio
-async def test_mass_parse(monkeypatch: Any) -> None:  # noqa: ANN401
+async def test_mass_parse(monkeypatch: Any) -> None:
     """Tests mass with single reading"""
     html_path = DATA_PATH / "mass-single-reading.html"
     mass_json_path = DATA_PATH / "mass-single-reading.json"
@@ -46,7 +48,7 @@ async def test_mass_parse(monkeypatch: Any) -> None:  # noqa: ANN401
 
 
 @pytest.mark.asyncio
-async def test_multiple_reading_parse(monkeypatch: Any) -> None:  # noqa: ANN401
+async def test_multiple_reading_parse(monkeypatch: Any) -> None:
     """Tests mass with multiple readings"""
     html_path = DATA_PATH / "mass-multiple-readings.html"
     mass_json_path = DATA_PATH / "mass-multiple-readings.json"
