@@ -33,7 +33,7 @@ keywords = [
 requires-python = "<4.0,>=3.8"
 dependencies = [
     "bs4<1.0.0,>=0.0.2",
-    "aiofiles<25.0.0,>=24.1.0",
+    "aiofiles>=24.1.0,<26.0.0",
     "curl-cffi>=0.9.0",
     "asyncclick<9.0.0.0,>=8.1.7.2",
     "html5lib<2.0,>=1.1",
