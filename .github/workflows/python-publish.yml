@@ -1,8 +1,5 @@
 name: Upload Python Package
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 on:
   release:
     types: [created]
