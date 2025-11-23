@@ -1,0 +1,54 @@
+name: Rebase Dependabot
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  rebase-dependabot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rebase Dependabot open PRs
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            // list open PRs
+            const { data: prs } = await github.rest.pulls.list({
+              owner, repo, state: "open", per_page: 100
+            });
+
+            for (const pr of prs) {
+              if (!pr.head.ref) {
+                continue;
+              }
+
+              // target dependabot PRs
+              const isDependabot = pr.user && (
+                 pr.user.login === "dependabot[bot]" ||
+                 (pr.user.login.endsWith("[bot]") && pr.head.ref.startsWith("dependabot/"))
+              );
+              if (!isDependabot) continue;
+
+              try {
+                await github.rest.pulls.updateBranch({
+                  owner,
+                  repo,
+                  pull_number: pr.number
+                });
+                core.info(`Requested update for PR #${pr.number}`);
+              } catch (err) {
+                core.warning(`Failed to update PR #${pr.number}: ${err.message}`);
+              }
+            }
