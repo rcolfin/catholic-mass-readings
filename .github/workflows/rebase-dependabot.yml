@@ -1,0 +1,54 @@
+name: Rebase Dependabot
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  rebase-dependabot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rebase Dependabot open PRs
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            // list open PRs
+            const { data: prs } = await github.rest.pulls.list({
+              owner, repo, state: "open", per_page: 100
+            });
+
+            for (const pr of prs) {
+              // target dependabot PRs: adjust predicate if you use a different bot user
+              const isDependabot = pr.user && (pr.user.login === "dependabot[bot]" || pr.user.login.endsWith("[bot]") && pr.head.ref.startsWith("dependabot/"));
+              if (!isDependabot) continue;
+
+              // skip PRs that touch workflow files if your app doesn't have workflows permission
+              const files = await github.rest.pulls.listFiles({ owner, repo, pull_number: pr.number, per_page: 100 });
+              const touchesWorkflows = files.data.some(f => f.filename.startsWith(".github/workflows/"));
+              if (touchesWorkflows) {
+                core.info(`Skipping PR #${pr.number} (touches workflow files)`);
+                continue;
+              }
+
+              try {
+                await github.rest.pulls.updateBranch({
+                  owner,
+                  repo,
+                  pull_number: pr.number
+                });
+                core.info(`Requested update for PR #${pr.number}`);
+              } catch (err) {
+                core.warning(`Failed to update PR #${pr.number}: ${err.message}`);
+              }
+            }
