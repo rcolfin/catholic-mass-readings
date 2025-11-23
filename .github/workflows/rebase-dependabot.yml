@@ -5,13 +5,14 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   rebase-dependabot:
@@ -29,9 +30,16 @@ jobs:
             });
 
             for (const pr of prs) {
-              // target dependabot PRs: adjust predicate if you use a different bot user
-              const isDependabot = pr.user && (pr.user.login === "dependabot[bot]" || pr.user.login.endsWith("[bot]") && pr.head.ref.startsWith("dependabot/"));
-              if (!isDependabot) continue;
+              if (!pr.head.ref) {
+                continue;
+              }
+
+              // target dependabot PRs
+              // const isDependabot = pr.user && (
+              //   pr.user.login === "dependabot[bot]" ||
+              //   (pr.user.login.endsWith("[bot]") && pr.head.ref.startsWith("dependabot/"))
+              // );
+              //if (!isDependabot) continue;
 
               try {
                 await github.rest.pulls.updateBranch({
