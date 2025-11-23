@@ -33,14 +33,6 @@ jobs:
               const isDependabot = pr.user && (pr.user.login === "dependabot[bot]" || pr.user.login.endsWith("[bot]") && pr.head.ref.startsWith("dependabot/"));
               if (!isDependabot) continue;
 
-              // skip PRs that touch workflow files if your app doesn't have workflows permission
-              const files = await github.rest.pulls.listFiles({ owner, repo, pull_number: pr.number, per_page: 100 });
-              const touchesWorkflows = files.data.some(f => f.filename.startsWith(".github/workflows/"));
-              if (touchesWorkflows) {
-                core.info(`Skipping PR #${pr.number} (touches workflow files)`);
-                continue;
-              }
-
               try {
                 await github.rest.pulls.updateBranch({
                   owner,
