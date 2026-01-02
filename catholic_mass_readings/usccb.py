@@ -5,6 +5,7 @@ import contextlib
 import datetime
 import html
 import logging
+import re
 from typing import TYPE_CHECKING, Final, cast
 
 from bs4 import BeautifulSoup
@@ -298,7 +299,21 @@ class USCCB:
 
     @staticmethod
     def _clean_text(string: str) -> str:
-        return html.unescape(string.replace("\xa0", " "))
+        text = html.unescape(string.replace("\xa0", " "))
+
+        # Fix common spacing issues
+        text = re.sub(r"\s+", " ", text)  # Multiple spaces to single space
+        text = re.sub(r"\.([A-Z])", r". \1", text)  # Add space after periods before capitals
+        text = re.sub(r",([A-Z])", r", \1", text)  # Add space after commas before capitals
+        text = re.sub(r";([A-Z])", r"; \1", text)  # Add space after semicolons before capitals
+
+        # Fix line breaks - convert to proper paragraphs
+        text = re.sub(r"\n\s*\n", "\n\n", text)  # Multiple newlines to double newline
+        text = re.sub(r"([.!?])\s*\n([A-Z])", r"\1\n\n\2", text)  # Add paragraph breaks after sentences
+
+        # Clean up extra whitespace but preserve intentional line breaks
+        lines = (line.strip() for line in text.split("\n") if line.strip())
+        return "\n\n".join(lines).strip()
 
     def _ensure_session(self) -> requests.AsyncSession:
         if self._session is None:
