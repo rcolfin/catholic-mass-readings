@@ -2,15 +2,13 @@ from __future__ import annotations
 
 import asyncio
 import datetime
-import json
 import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Final
 
-import aiofiles
 import asyncclick as click
 
-from catholic_mass_readings import USCCB, models
+from catholic_mass_readings import USCCB, _io, models
 from catholic_mass_readings.commands.common import cli
 
 if TYPE_CHECKING:
@@ -50,10 +48,7 @@ async def get_readings(date: datetime.datetime, types: list[models.MassType] | N
     print(mass)  # noqa: T201
 
     if save is not None:
-        save_path = Path(save)
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-        async with aiofiles.open(save_path, mode="w", encoding="utf-8") as f:
-            await f.write(json.dumps(mass.to_dict(), indent=4, sort_keys=True))
+        await _io.write_file(Path(save), mass.to_dict())
 
 
 @cli.command("get-mass-types")
@@ -120,7 +115,4 @@ async def _get_readings_range(
         print(mass, end=end)  # noqa: T201
 
     if save is not None:
-        save_path = Path(save)
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-        async with aiofiles.open(save_path, mode="w", encoding="utf-8") as f:
-            await f.write(json.dumps([m.to_dict() for m in masses], indent=4, sort_keys=True))
+        await _io.write_file(Path(save), [m.to_dict() for m in masses])

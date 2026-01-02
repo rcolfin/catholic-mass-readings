@@ -1,6 +1,6 @@
 [project]
 name = "catholic-mass-readings"
-version = "0.6.0"
+version = "0.7.0"
 description = "Provides an API for scraping the web page from https://bible.usccb.org/bible/readings/ to get the readings"
 authors = [
     {name = "Robert Colfin", email = "robert.m.colfin@gmail.com"},
@@ -32,28 +32,28 @@ keywords = [
 ]
 requires-python = "<4.0,>=3.8"
 dependencies = [
-    "bs4<1.0.0,>=0.0.2",
     "aiofiles>=24.1.0,<26.0.0",
-    "curl-cffi>=0.9.0",
+    "anyio>=4.5.2",
     "asyncclick<9.0.0.0,>=8.1.7.2",
+    "bs4<1.0.0,>=0.0.2",
+    "curl-cffi>=0.9.0",
     "html5lib<2.0,>=1.1",
     "pytz<2026.0,>=2024.2",
-    "anyio>=4.5.2",
 ]
 
 [dependency-groups]
 dev = [
     "mypy<2.0.0,>=1.11.2",
-    "ruff<1.0.0,>=0.9.0",
-    "pytest>=8.3.5",
+    "pytest-asyncio>=0.24.0",
     "pytest-cov>=5.0.0",
-    "pytest-ruff>=0.5",
     "pytest-mypy>=1.0.1",
+    "pytest-ruff>=0.5",
+    "pytest>=8.3.5",
+    "ruff<1.0.0,>=0.9.0",
+    "sphinx-material<1.0.0,>=0.0.36",
     "types-aiofiles>=24.1.0.20240626,<26.0.0.0",
     "types-beautifulsoup4<5.0.0.0,>=4.12.0.20240907",
     "types-pytz<2026.0.0.0,>=2024.2.0.20241003",
-    "sphinx-material<1.0.0,>=0.0.36",
-    "pytest-asyncio>=0.24.0",
 ]
 
 [tool.pytest.ini_options]

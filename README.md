@@ -113,3 +113,19 @@ Run [scripts/lock.sh](../scripts/lock.sh)
 ### Run code
 
 Run [scripts/console.sh](../scripts/console.sh) uv run python -m catholic_mass_readings
+
+### Testing
+
+### Generating Test Data
+
+```sh
+uv run python -m catholic_mass_readings get-mass --date "2025-08-06" -t DEFAULT --save tests/data/mass-single-reading.json
+
+uv run python -m catholic_mass_readings get-mass --date "2025-08-10" -t DEFAULT --save tests/data/mass-multiple-readings.json
+```
+
+### Run tests
+
+```sh
+uv run pytest
+```
