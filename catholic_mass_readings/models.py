@@ -11,14 +11,14 @@ if TYPE_CHECKING:
 
 
 class _CaseInsensitiveEnumMeta(EnumMeta):
-    def __call__(cls, value: str, *args: Any, **kwargs: Any):  # type: ignore # noqa: PGH003
+    def __call__(cls, value: str, *args: Any, **kwargs: Any) -> Enum:  # type: ignore # noqa: PGH003
         try:
             return super().__call__(value, *args, **kwargs)
         except ValueError:
             items = cast("Iterable[Enum]", cls)
             for item in items:
                 if item.name.casefold() == value.casefold():
-                    return cast("type[Enum]", item)
+                    return cast("Enum", item)
             raise
 
 
@@ -105,26 +105,44 @@ class SectionType(IntEnum):
 
     @property
     def is_unknown(self) -> bool:
+        """Returns True if this is an unknown section type."""
         return self == self.UNKNOWN
 
     @property
     def is_reading(self) -> bool:
+        """Returns True if this is a standard reading section."""
         return self == self.READING
 
     @property
     def is_gospel(self) -> bool:
+        """Returns True if this is a gospel section."""
         return self == self.GOSPEL
 
     @property
     def is_alternative(self) -> bool:
+        """Returns True if this is an alternative reading section."""
         return self == self.ALTERNATIVE
 
     @property
     def is_song(self) -> bool:
+        """Returns True if this is a sung section (Alleluia, Psalm, or Sequence)."""
         return self in (self.ALLELUIA, self.PSALM, self.SEQUENCE)
 
     @classmethod
     def from_header(cls, header: str) -> SectionType:  # noqa: PLR0911
+        """
+        Infers the SectionType from a section header string.
+
+        Matching is case-insensitive and keyword-based: "alleluia" → ALLELUIA,
+        "gospel" → GOSPEL, "psalm" → PSALM, "sequence" → SEQUENCE,
+        "reading" → READING, "or" → ALTERNATIVE. Returns UNKNOWN for no match.
+
+        Args:
+            header (str): The raw section header text from the USCCB page.
+
+        Returns:
+            SectionType matching the header keyword, or UNKNOWN.
+        """
         header = header.casefold()
         if "alleluia" in header:
             return cls.ALLELUIA
@@ -248,6 +266,13 @@ class Section(NamedTuple):
 
     @property
     def display_header(self) -> str:
+        """
+        Returns the human-readable section header.
+
+        For READING sections the raw header (e.g. "Reading I") is translated to a
+        friendly label via SECTION_HEADER_READINGS (e.g. "First Reading").
+        All other section types return their header unchanged.
+        """
         if self.type_ == SectionType.READING:
             reading_number = utils.get_reading_number(self.header)
             return constants.SECTION_HEADER_READINGS.get(reading_number, self.header) if reading_number else self.header
@@ -256,6 +281,13 @@ class Section(NamedTuple):
 
     @property
     def footer(self) -> str:
+        """
+        Returns the liturgical closing response for this section.
+
+        READING sections end with "The word of the Lord." / "Thanks be to God."
+        GOSPEL sections end with "The Gospel of the Lord." / "Praise to you, Lord Jesus Christ."
+        All other section types return an empty string.
+        """
         if self.type_.is_reading:
             return f"\n{constants.READING_CLOSE_REMARKS}\n{constants.READING_CLOSE_RESPONSE}"
 

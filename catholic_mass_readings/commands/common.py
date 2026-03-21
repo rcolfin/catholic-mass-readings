@@ -18,6 +18,7 @@ LOG_LEVELS: Final[list[str]] = [
 @click.group()
 @click.option("--log-level", type=click.Choice(LOG_LEVELS, case_sensitive=False), default="INFO")
 async def cli(log_level: str) -> None:
+    """Catholic Mass Readings CLI — fetch daily readings from bible.usccb.org."""
     for logger in logging.getLogger(__name__).manager.loggerDict.values():
         if isinstance(logger, logging.Logger):
             logger.setLevel(log_level)

@@ -38,15 +38,17 @@ class USCCB:
     def __init__(self) -> None:
         self._session: requests.AsyncSession | None = None
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> USCCB:  # noqa: PYI034
+        """Enter the async context manager."""
         return self
 
     async def __aexit__(
         self,
         exc_type: type[BaseException] | None,
-        exc_val: object,
+        exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> bool | None:
+        """Exit the async context manager, closing the underlying session."""
         await self.close()
         return False
 

@@ -25,6 +25,20 @@ _URL_PATTERN: Final[re.Pattern[str]] = re.compile(r"readings\/(?P<DATE>\d{6})-?(
 
 
 def find_iter(parent: Tag, *, name: str | None = None, class_: str | None = None) -> Iterable[Tag]:
+    """
+    Yields all tags matching `name` and/or `class_` in document order.
+
+    Uses consecutive `find_next` calls so it traverses the full subtree without
+    loading all results into memory at once.
+
+    Args:
+        parent (Tag): The BeautifulSoup tag to search within.
+        name (str | None): Optional HTML tag name filter (e.g. "div").
+        class_ (str | None): Optional CSS class filter (e.g. "container").
+
+    Yields:
+        Tag: Each matching element in document order.
+    """
     container = parent.find(name=name, class_=class_)
     while container:
         yield cast("Tag", container)
