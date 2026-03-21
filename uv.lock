@@ -9,6 +9,12 @@ resolution-markers = [
     "python_full_version < '3.9'",
 ]
 
+[manifest]
+constraints = [
+    { name = "filelock", marker = "python_full_version >= '3.10'", specifier = ">=3.20.3" },
+    { name = "urllib3", marker = "python_full_version >= '3.9'", specifier = ">=2.6.3" },
+]
+
 [[package]]
 name = "aiofiles"
 version = "24.1.0"

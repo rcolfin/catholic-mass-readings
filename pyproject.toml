@@ -162,6 +162,12 @@ line-ending = "auto"
 [tool.ruff.lint.isort]
 force-single-line = false
 
+[tool.uv]
+constraint-dependencies = [
+    "filelock>=3.20.3; python_version >= '3.10'",
+    "urllib3>=2.6.3; python_version >= '3.9'",
+]
+
 [tool.pdm.build]
 includes = []
 [build-system]
