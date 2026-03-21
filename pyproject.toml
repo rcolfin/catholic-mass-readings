@@ -1,6 +1,6 @@
 [project]
 name = "catholic-mass-readings"
-version = "0.7.0"
+version = "0.7.1"
 description = "Provides an API for scraping the web page from https://bible.usccb.org/bible/readings/ to get the readings"
 authors = [
     {name = "Robert Colfin", email = "robert.m.colfin@gmail.com"},

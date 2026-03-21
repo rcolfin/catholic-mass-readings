@@ -39,6 +39,7 @@ def _get_mass_types(ctx: click.Context, param: click.Option, value: tuple[str, .
 )
 @click.option("--save", type=click.Path(dir_okay=False, writable=True))
 async def get_readings(date: datetime.datetime, types: list[models.MassType] | None, save: str | None) -> None:
+    """Fetch the mass readings for a specific date and print them to stdout."""
     async with USCCB() as usccb:
         mass = await usccb.get_mass_from_date(date.date(), types)
         if not mass:
@@ -54,6 +55,7 @@ async def get_readings(date: datetime.datetime, types: list[models.MassType] | N
 @cli.command("get-mass-types")
 @click.option("--date", type=click.DateTime([_DATE_TIME_FMT]), default=_TODAY)
 async def get_mass_types(date: datetime.datetime) -> None:
+    """List all mass types available for a given date."""
     async with USCCB() as usccb:
         mass_types = await usccb.get_mass_types(date.date())
     for mass_type in mass_types:
@@ -77,6 +79,7 @@ async def get_mass_types(date: datetime.datetime) -> None:
 async def get_readings_range(
     start: datetime.datetime, end: datetime.datetime, types: list[models.MassType] | None, step: int, save: str | None
 ) -> None:
+    """Fetch mass readings for each date in a range, stepping by a given number of days."""
     dates = USCCB.get_mass_dates(start.date(), end.date(), step=datetime.timedelta(days=step))
     await _get_readings_range(dates, types, save)
 
@@ -97,6 +100,7 @@ async def get_readings_range(
 async def get_sunday_readings_range(
     start: datetime.datetime, end: datetime.datetime, types: list[models.MassType] | None, save: str | None
 ) -> None:
+    """Fetch Sunday mass readings for each Sunday in a date range."""
     dates = USCCB.get_sunday_mass_dates(start.date(), end.date())
     await _get_readings_range(dates, types, save)
 
