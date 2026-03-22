@@ -22,11 +22,11 @@ def _setup_mock(monkeypatch: Any, html_path: Path) -> None:
         def raise_for_status(self: MockResponse) -> None:
             pass
 
-    async def mock_async_get(self: requests.AsyncSession, url: str) -> MockResponse:
+    async def mock_async_get(self: requests.AsyncSession[requests.Response], url: str) -> MockResponse:
         html_content = html_path.read_text(encoding="utf-8")  # noqa: ASYNC240
         return MockResponse(html_content)
 
-    monkeypatch.setattr(requests.AsyncSession, "get", mock_async_get)
+    monkeypatch.setattr(requests.AsyncSession[requests.Response], "get", mock_async_get)
 
 
 async def _test_mass_parse(monkeypatch: Any, html_path: Path, mass_json_path: Path) -> None:

@@ -36,7 +36,7 @@ class USCCB:
     """Default list of MassTypes to try when searching for a mass on a given mass date."""
 
     def __init__(self) -> None:
-        self._session: requests.AsyncSession | None = None
+        self._session: requests.AsyncSession[requests.Response] | None = None
 
     async def __aenter__(self) -> USCCB:  # noqa: PYI034
         """Enter the async context manager."""
@@ -317,10 +317,10 @@ class USCCB:
         lines = (line.strip() for line in text.split("\n") if line.strip())
         return "\n\n".join(lines).strip()
 
-    def _ensure_session(self) -> requests.AsyncSession:
+    def _ensure_session(self) -> requests.AsyncSession[requests.Response]:
         if self._session is None:
             self._session = self._create_session()
         return self._session
 
-    def _create_session(self) -> requests.AsyncSession:
-        return requests.AsyncSession(impersonate="chrome110")
+    def _create_session(self) -> requests.AsyncSession[requests.Response]:
+        return requests.AsyncSession[requests.Response](impersonate="chrome110")
