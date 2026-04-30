@@ -323,4 +323,4 @@ class USCCB:
         return self._session
 
     def _create_session(self) -> requests.AsyncSession:
-        return requests.AsyncSession(impersonate="chrome110")
+        return requests.AsyncSession(impersonate="chrome")
