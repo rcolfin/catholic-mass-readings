@@ -182,8 +182,8 @@ class USCCB:
         """
         session = self._ensure_session()
         urls_to_type = {type_.to_url(date): type_ for type_ in models.MassType}
-        requests = [session.head(url) for url in urls_to_type]
-        responses = await asyncio.gather(*requests)
+        head_tasks = [session.head(url) for url in urls_to_type]
+        responses = await asyncio.gather(*head_tasks)
         ok_responses = (r for r in responses if r.ok)
         return sorted(urls_to_type[str(cast("Request", r.request).url)] for r in ok_responses)
 

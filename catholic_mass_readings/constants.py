@@ -34,12 +34,12 @@ GOSPEL_CLOSE_REMARKS: Final[str] = "The Gospel of the Lord."
 SECTION_HEADER_FIRST_READING: Final[str] = "First Reading"
 SECTION_HEADER_SECOND_READING: Final[str] = "Second Reading"
 SECTION_HEADER_THIRD_READING: Final[str] = "Third Reading"
-SECTION_HEADER_FORTH_READING: Final[str] = "Forth Reading"
+SECTION_HEADER_FOURTH_READING: Final[str] = "Fourth Reading"
 SECTION_HEADER_READINGS: Final[dict[int, str]] = {
     1: SECTION_HEADER_FIRST_READING,
     2: SECTION_HEADER_SECOND_READING,
     3: SECTION_HEADER_THIRD_READING,
-    4: SECTION_HEADER_FORTH_READING,
+    4: SECTION_HEADER_FOURTH_READING,
 }
 
 OLD_TESTAMENT_BOOKS: Final[list[dict[str, str]]] = [
