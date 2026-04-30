@@ -369,3 +369,71 @@ def test_mass_repr() -> None:
     r = repr(mass)
     assert "Transfiguration" in r
     assert "2025" in r
+
+
+def test_mass_str_contains_title_and_url() -> None:
+    reading = Reading(verses=[_GENESIS_VERSE], text="In the beginning...")
+    section = Section(type_=SectionType.READING, header="Reading I", readings=[reading])
+    mass = Mass(
+        date=datetime.date(2025, 8, 6),
+        type_=MassType.DEFAULT,
+        url="https://example.com",
+        title="Test Mass",
+        sections=[section],
+    )
+    text = str(mass)
+    assert "Test Mass" in text
+    assert "https://example.com" in text
+    assert "In the beginning..." in text
+
+
+def test_mass_str_no_date() -> None:
+    mass = Mass(date=None, type_=None, url="https://example.com", title="Test", sections=[])
+    text = str(mass)
+    assert "Test" in text
+
+
+def test_mass_to_dict_with_datetime_object() -> None:
+    """Mass.to_dict() must extract the .date() from a datetime.datetime value."""
+    mass = Mass(
+        date=datetime.datetime(2025, 8, 6, 10, 30, tzinfo=datetime.timezone.utc),  # type: ignore[arg-type]
+        type_=MassType.DAY,
+        url="https://example.com",
+        title="Test",
+        sections=[],
+    )
+    d: dict[str, Any] = mass.to_dict()
+    assert d["date"] == "2025-08-06"
+
+
+# ---------------------------------------------------------------------------
+# Section.__str__
+# ---------------------------------------------------------------------------
+
+
+def test_section_str_reading_contains_text() -> None:
+    reading = Reading(verses=[_GENESIS_VERSE], text="In the beginning...")
+    section = Section(type_=SectionType.READING, header="Reading I", readings=[reading])
+    text = str(section)
+    assert "In the beginning..." in text
+    assert constants.READING_CLOSE_REMARKS in text
+
+
+def test_section_str_multiple_readings() -> None:
+    r1 = Reading(verses=[_GENESIS_VERSE], text="First text")
+    r2 = Reading(verses=[_EXODUS_VERSE], text="Second text")
+    section = Section(type_=SectionType.READING, header="Reading I", readings=[r1, r2])
+    text = str(section)
+    assert "First text" in text
+    assert "Second text" in text
+
+
+# ---------------------------------------------------------------------------
+# MassType ordering
+# ---------------------------------------------------------------------------
+
+
+def test_mass_type_sorted_order() -> None:
+    types = [MassType.YEARA, MassType.DEFAULT, MassType.DAY]
+    # MassType extends str, so sorts by string value: "" < "DAY" < "YEARA"
+    assert sorted(types) == [MassType.DEFAULT, MassType.DAY, MassType.YEARA]
