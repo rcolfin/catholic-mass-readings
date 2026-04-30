@@ -383,7 +383,7 @@ def test_mass_str_contains_title_and_url() -> None:
     )
     text = str(mass)
     assert "Test Mass" in text
-    assert "https://example.com" in text
+    assert mass.url in text
     assert "In the beginning..." in text
 
 
