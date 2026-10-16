@@ -6,21 +6,26 @@ import datetime
 import html
 import logging
 import re
-from typing import TYPE_CHECKING, Final, cast
+from typing import TYPE_CHECKING, Final, Literal, cast
 
+import anyio
 from bs4 import BeautifulSoup
 from curl_cffi import requests
 
-from catholic_mass_readings import constants, models, utils
+from catholic_mass_readings import challenge, constants, models, utils
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from types import TracebackType
 
     from bs4.element import Tag
-    from curl_cffi.requests.models import Request
 
 logger = logging.getLogger(__name__)
+
+# Times a challenged request retries with the clearance of a concurrent request before giving up.
+_MAX_CONCURRENT_CLEARANCES: Final[int] = 3
+
+_OBOLUS_COOKIE_PREFIX: Final[str] = "X_Obolus_"
 
 
 class USCCB:
@@ -35,8 +40,19 @@ class USCCB:
     ]
     """Default list of MassTypes to try when searching for a mass on a given mass date."""
 
-    def __init__(self) -> None:
+    def __init__(self, browser: challenge.BrowserConfig | None = None) -> None:
+        """
+        Args:
+            browser (BrowserConfig): How to obtain the browser used to pass the site's JavaScript
+                challenge (defaults to `BrowserConfig.from_env()`).
+        """
         self._session: requests.AsyncSession | None = None
+        self._browser = challenge.BrowserConfig.from_env() if browser is None else browser
+        self._challenge_lock = anyio.Lock()
+        self._clearance_generation = 0
+        # The generation whose solve failed, and its error message (not the error, which keeps the browser alive).
+        self._failed_solve: tuple[int, str] | None = None
+        self._cache_loaded = self._browser.cookie_cache is None
 
     async def __aenter__(self) -> USCCB:  # noqa: PYI034
         """Enter the async context manager."""
@@ -180,19 +196,16 @@ class USCCB:
         Returns:
             list[models.MassType] for each of the supported mass types.
         """
-        session = self._ensure_session()
-        urls_to_type = {type_.to_url(date): type_ for type_ in models.MassType}
-        head_tasks = [session.head(url) for url in urls_to_type]
-        responses = await asyncio.gather(*head_tasks)
-        ok_responses = (r for r in responses if r.ok)
-        return sorted(urls_to_type[str(cast("Request", r.request).url)] for r in ok_responses)
+        types = list(models.MassType)
+        responses = await asyncio.gather(*(self._request("HEAD", type_.to_url(date)) for type_ in types))
+        return sorted(type_ for type_, r in zip(types, responses, strict=True) if r.ok)
 
     async def _get_mass(
         self, url: str, date: datetime.date | None, type_: models.MassType | str | None
     ) -> models.Mass | None:
         logger.debug("Querying url: %s", url)
         try:
-            r = await self._ensure_session().get(url)
+            r = await self._request("GET", url)
             r.raise_for_status()
             content = r.text
         except Exception:
@@ -316,6 +329,87 @@ class USCCB:
         # Clean up extra whitespace but preserve intentional line breaks
         lines = (line.strip() for line in text.split("\n") if line.strip())
         return "\n\n".join(lines).strip()
+
+    async def _request(self, method: Literal["GET", "HEAD"], url: str) -> requests.Response:
+        """Performs the request, solving the site's JavaScript challenge if it is encountered."""
+        await self._load_cached_clearance()
+        solved = False
+        concurrent_clearances = 0
+        while True:
+            generation = self._clearance_generation
+            r = await self._send(method, url)
+            if not self._is_challenge(r, method):
+                return r
+            if solved or concurrent_clearances >= _MAX_CONCURRENT_CLEARANCES:
+                msg = f"Still challenged after solving the JavaScript challenge for {url}"
+                raise challenge.ChallengeError(msg)
+            logger.debug("JavaScript challenge encountered for url: %s", url)
+            # When a concurrent request cleared the challenge instead, its clearance is tried before solving again.
+            solved = await self._clear_challenge(url, generation)
+            concurrent_clearances += not solved
+
+    async def _send(self, method: Literal["GET", "HEAD"], url: str) -> requests.Response:
+        session = self._ensure_session()
+        return await (session.head(url) if method == "HEAD" else session.get(url))
+
+    @staticmethod
+    def _is_challenge(r: requests.Response, method: Literal["GET", "HEAD"]) -> bool:
+        # A HEAD response has no body, so the challenge can only be recognised by its headers.
+        return challenge.is_challenge(r.status_code, r.headers, r.text if method == "GET" else None)
+
+    async def _clear_challenge(self, url: str, generation: int) -> bool:
+        """
+        Solves the challenge, unless a concurrent request already attempted it since `generation`.
+
+        If that attempt failed, its error is raised rather than launching the browser again for every
+        request that was waiting on it.
+
+        Returns:
+            Whether the challenge was solved by this call (rather than by a concurrent request).
+        """
+        async with self._challenge_lock:
+            if generation != self._clearance_generation:
+                if self._failed_solve is not None and self._failed_solve[0] == generation:
+                    raise challenge.ChallengeError(self._failed_solve[1])
+                return False
+
+            try:
+                clearance = await challenge.solve(url, self._browser)
+            except challenge.ChallengeError as e:
+                self._failed_solve = (generation, str(e))
+                self._clearance_generation += 1
+                raise
+            self._apply_clearance(clearance)
+            self._clearance_generation += 1
+            if self._browser.cookie_cache is not None:
+                await challenge.save_clearance(self._browser.cookie_cache, clearance)
+            return True
+
+    async def _load_cached_clearance(self) -> None:
+        """Applies the clearance saved by an earlier run (once), if `BrowserConfig.cookie_cache` is set."""
+        if self._cache_loaded:
+            return
+        async with self._challenge_lock:
+            if self._cache_loaded or self._browser.cookie_cache is None:
+                return
+            self._cache_loaded = True
+            clearance = await challenge.load_clearance(self._browser.cookie_cache)
+            if clearance is not None:
+                logger.debug("Using challenge cookie cache: %s", self._browser.cookie_cache)
+                self._apply_clearance(clearance)
+
+    def _apply_clearance(self, clearance: challenge.Clearance) -> None:
+        session = self._ensure_session()
+        # Drop the cookies of an earlier clearance, which may be stored under a different domain and be sent too.
+        for name in {c["name"] for c in clearance.cookies} | {
+            c.name for c in session.cookies.jar if c.name.startswith(_OBOLUS_COOKIE_PREFIX)
+        }:
+            session.cookies.delete(name)
+        for cookie in clearance.cookies:
+            session.cookies.set(
+                cookie["name"], cookie["value"], domain=cookie.get("domain", ""), path=cookie.get("path", "/")
+            )
+        session.headers["User-Agent"] = clearance.user_agent
 
     def _ensure_session(self) -> requests.AsyncSession:
         if self._session is None:

@@ -48,6 +48,6 @@ uv run python -m catholic_mass_readings get-mass --date "2025-08-06" -t DEFAULT 
 ### Code Style
 
 - Line length: 120 (ruff)
-- Target: Python 3.8 (`>=3.8,<4.0`)
+- Target: Python 3.10+ (`>=3.10,<4.0`; CI tests 3.10–3.14)
 - Type annotations required (mypy strict-ish, checked via pytest-mypy)
 - Async throughout — prefer `anyio`-compatible patterns

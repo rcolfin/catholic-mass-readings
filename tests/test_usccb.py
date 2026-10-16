@@ -18,6 +18,7 @@ def _setup_mock(monkeypatch: Any, html_path: Path) -> None:
         def __init__(self, text: str) -> None:
             self.text = text
             self.status_code = 200
+            self.headers: dict[str, str] = {}
 
         def raise_for_status(self: MockResponse) -> None:
             pass
@@ -259,17 +260,14 @@ async def test_get_mass_types_returns_matching_types(monkeypatch: Any) -> None:
     date = datetime.date(2025, 8, 6)
     default_url = models.MassType.DEFAULT.to_url(date)
 
-    class _MockRequest:
-        def __init__(self, url: str) -> None:
-            self.url = url
-
     class _MockResponse:
-        def __init__(self, url: str, *, ok: bool) -> None:
+        def __init__(self, *, ok: bool) -> None:
             self.ok = ok
-            self.request = _MockRequest(url)
+            self.status_code = 200 if ok else 404
+            self.headers: dict[str, str] = {}
 
     async def mock_head(self: requests.AsyncSession, url: str) -> _MockResponse:
-        return _MockResponse(url, ok=(url == default_url))
+        return _MockResponse(ok=(url == default_url))
 
     monkeypatch.setattr(requests.AsyncSession, "head", mock_head)
     async with USCCB() as usccb:

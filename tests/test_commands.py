@@ -8,7 +8,9 @@ import pytest
 from asyncclick.testing import CliRunner
 
 from catholic_mass_readings import USCCB
+from catholic_mass_readings.challenge import ENV_PREFIX, BrowserConfig
 from catholic_mass_readings.commands import cli
+from catholic_mass_readings.commands import mass as mass_commands
 from catholic_mass_readings.models import Mass, MassType, Reading, Section, SectionType, Verse
 
 if TYPE_CHECKING:
@@ -159,3 +161,53 @@ async def test_get_sunday_mass_range_with_save(tmp_path: Path) -> None:
         )
     assert result.exit_code == 0
     assert save_path.exists()
+
+
+# ---------------------------------------------------------------------------
+# browser options
+# ---------------------------------------------------------------------------
+
+
+async def _invoke_with_browser_options(args: list[str], env: dict[str, str]) -> tuple[int, BrowserConfig | None]:
+    runner = CliRunner()
+    # patch.object, as `commands/__init__.py` removes the `mass` attribute, which Python 3.10 resolves with getattr.
+    with patch.object(mass_commands, "USCCB") as mock_cls:
+        mock = AsyncMock(spec=USCCB)
+        mock.get_mass_from_date.return_value = _MASS
+        mock_cls.return_value.__aenter__.return_value = mock
+        result = await runner.invoke(cli, [*args, "get-mass", "--date", "2025-08-06", "-t", "DEFAULT"], env=env)
+    config = mock_cls.call_args.args[0] if mock_cls.call_args else None
+    if result.exit_code == 0:
+        assert "Transfiguration" in result.output
+    return result.exit_code, config
+
+
+@pytest.mark.asyncio
+async def test_browser_options_override_environment() -> None:
+    env = {f"{ENV_PREFIX}CHANNEL": "chrome", f"{ENV_PREFIX}TIMEOUT": "45", f"{ENV_PREFIX}HEADLESS": "false"}
+    exit_code, config = await _invoke_with_browser_options(["--browser-timeout", "10"], env)
+    assert exit_code == 0
+    assert config == BrowserConfig(channel="chrome", headless=False, timeout=10.0)
+
+
+@pytest.mark.asyncio
+async def test_browser_connection_option_replaces_environment_connection() -> None:
+    env = {f"{ENV_PREFIX}CDP_URL": "http://127.0.0.1:9222", f"{ENV_PREFIX}TIMEOUT": "45"}
+    exit_code, config = await _invoke_with_browser_options(["--browser-ws-endpoint", "ws://127.0.0.1:3000/"], env)
+    assert exit_code == 0
+    assert config == BrowserConfig(ws_endpoint="ws://127.0.0.1:3000/", timeout=45.0)
+
+
+@pytest.mark.asyncio
+async def test_browser_options_tolerate_invalid_environment_timeout() -> None:
+    exit_code, config = await _invoke_with_browser_options([], {f"{ENV_PREFIX}TIMEOUT": "5s"})
+    assert exit_code == 0
+    assert config == BrowserConfig()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("timeout", ["0", "-1"])
+async def test_browser_timeout_must_be_positive(timeout: str) -> None:
+    exit_code, config = await _invoke_with_browser_options(["--browser-timeout", timeout], {})
+    assert exit_code == 2  # noqa: PLR2004
+    assert config is None

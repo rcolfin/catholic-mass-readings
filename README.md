@@ -22,6 +22,83 @@ You can also clone the repo and run the following command in the project root to
 
     $ pip install -e .
 
+### JavaScript challenge (optional browser support)
+
+The USCCB site sometimes answers with a "Checking connection" page that requires JavaScript to pass.
+When that happens, a browser is driven through [Playwright](https://playwright.dev/python/) to pass the
+challenge once, and its cookie is reused for the rest of the requests. Playwright is an optional dependency:
+
+    $ pip install 'catholic-mass-readings[browser]'
+
+Without it, a `catholic_mass_readings.challenge.ChallengeError` is raised when the challenge is encountered.
+
+The browser can be obtained in one of three ways, configured with environment variables or the matching CLI options
+(which take precedence over the environment variables):
+
+| Environment variable | CLI option | Description |
+| --- | --- | --- |
+| *(none)* | | Launch Playwright's bundled headless Chromium (requires `playwright install chromium`). |
+| `CATHOLIC_MASS_READINGS_BROWSER_CHANNEL` | `--browser-channel` | Launch an installed browser instead (`chrome`, `msedge`, ...). |
+| `CATHOLIC_MASS_READINGS_BROWSER_CDP_URL` | `--browser-cdp-url` | Connect to an already running Chromium-based browser over the Chrome DevTools Protocol. |
+| `CATHOLIC_MASS_READINGS_BROWSER_WS_ENDPOINT` | `--browser-ws-endpoint` | Connect to a [Playwright server](https://playwright.dev/docs/docker#remote-connection). |
+| `CATHOLIC_MASS_READINGS_BROWSER_HEADLESS` | `--browser-headless/--browser-headed` | Whether a launched browser is headless (default: `true`). |
+| `CATHOLIC_MASS_READINGS_BROWSER_TIMEOUT` | `--browser-timeout` | Seconds to wait for the challenge (default: `30`). |
+| `CATHOLIC_MASS_READINGS_BROWSER_COOKIE_CACHE` | `--browser-cookie-cache` | File in which to save the challenge cookie so separate runs reuse it until it expires (about 30 minutes). |
+
+#### Docker
+
+The simplest image installs a browser alongside the package (larger, but self-contained):
+
+```dockerfile
+FROM python:3.13-slim
+RUN pip install --no-cache-dir 'catholic-mass-readings[browser]' \
+    && playwright install --with-deps chromium
+# Optional: reuse the challenge cookie across runs (mount a volume at /cache).
+ENV CATHOLIC_MASS_READINGS_BROWSER_COOKIE_CACHE=/cache/cookies.json
+ENTRYPOINT ["python", "-m", "catholic_mass_readings"]
+```
+
+```sh
+docker build -t catholic-mass-readings .
+docker run --rm -v catholic-mass-readings-cache:/cache catholic-mass-readings get-mass --date 2025-08-06
+```
+
+Connecting to a running browser instead means the image only needs the `playwright` Python package
+(`pip install 'catholic-mass-readings[browser]'`, without `playwright install`), not a browser:
+
+```sh
+# Use Chrome running on the host (e.g. Windows), started with remote debugging enabled:
+#   chrome.exe --remote-debugging-port=9222 --user-data-dir=%TEMP%\chrome-cdp
+docker run --rm -e CATHOLIC_MASS_READINGS_BROWSER_CDP_URL=http://<host-ip>:9222 ...
+
+# Or use a Playwright server container alongside it (match the Playwright version):
+docker run -p 3000:3000 mcr.microsoft.com/playwright:v1.64.0-noble \
+    npx -y playwright@1.64.0 run-server --port 3000 --host 0.0.0.0
+docker run --rm -e CATHOLIC_MASS_READINGS_BROWSER_WS_ENDPOINT=ws://<playwright-host>:3000/ ...
+```
+
+Notes on connecting over CDP:
+
+* Use an IP address in the CDP URL. Chrome rejects DevTools requests whose `Host` is a name other than
+  `localhost`, and `localhost` itself may first resolve to IPv6, adding a long delay (use `127.0.0.1`).
+* Chrome only listens on `127.0.0.1`, so reaching it from a container or another machine needs a port forward
+  (e.g. `netsh interface portproxy` on Windows).
+* Anyone who can reach the debugging port has full control of that browser profile. Use a dedicated
+  `--user-data-dir` and don't expose the port beyond the machines that need it.
+
+See the [browser and Docker documentation](https://rcolfin.github.io/catholic-mass-readings/browser.html) for a Docker Compose
+example and troubleshooting.
+
+In code, pass a `BrowserConfig` instead:
+
+```python
+from catholic_mass_readings import USCCB
+from catholic_mass_readings.challenge import BrowserConfig
+
+async with USCCB(BrowserConfig(cdp_url="http://127.0.0.1:9222")) as usccb:
+    ...
+```
+
 ## API Usage:
 
 ```python

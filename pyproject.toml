@@ -1,6 +1,6 @@
 [project]
 name = "catholic-mass-readings"
-version = "0.7.4"
+version = "0.8.0"
 description = "Provides an API for scraping the web page from https://bible.usccb.org/bible/readings/ to get the readings"
 authors = [
     {name = "Robert Colfin", email = "robert.m.colfin@gmail.com"},
@@ -39,6 +39,11 @@ dependencies = [
     "pytz>=2024.2,<2027.0",
 ]
 
+[project.optional-dependencies]
+browser = [
+    "playwright>=1.49",
+]
+
 [dependency-groups]
 dev = [
     "mypy>=1.11.2,<3.0.0",
@@ -58,6 +63,11 @@ dev = [
 
 [tool.pytest.ini_options]
 addopts = "--doctest-modules --mypy --ruff --ruff-format"
+
+[[tool.mypy.overrides]]
+# Optional dependency (the `browser` extra).
+module = ["playwright.*"]
+ignore_missing_imports = true
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
