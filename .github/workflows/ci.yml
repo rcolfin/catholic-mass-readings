@@ -58,7 +58,8 @@ jobs:
           set -euox pipefail
           PACKAGE=$(echo "$(basename $PWD)" | tr "-" "_")
           [ -d "${PACKAGE}" ] || PACKAGE="."
-          uv run --frozen pytest --cov-report=xml:${{ github.workspace }}/build/coverage/coverage.xml --cov="${PACKAGE}" --junitxml=${{ github.workspace }}/build/test-results/tests.xml
+          # The browser extra (the playwright package only, no browser) lets its error handling be tested.
+          uv run --frozen --extra browser pytest --cov-report=xml:${{ github.workspace }}/build/coverage/coverage.xml --cov="${PACKAGE}" --junitxml=${{ github.workspace }}/build/test-results/tests.xml
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v6

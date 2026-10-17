@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Final
 import asyncclick as click
 
 from catholic_mass_readings import USCCB, _io, models
+from catholic_mass_readings.challenge import BrowserConfig
 from catholic_mass_readings.commands.common import cli
 
 if TYPE_CHECKING:
@@ -40,7 +41,7 @@ def _get_mass_types(ctx: click.Context, param: click.Option, value: tuple[str, .
 @click.option("--save", type=click.Path(dir_okay=False, writable=True))
 async def get_readings(date: datetime.datetime, types: list[models.MassType] | None, save: str | None) -> None:
     """Fetch the mass readings for a specific date and print them to stdout."""
-    async with USCCB() as usccb:
+    async with USCCB(click.get_current_context().find_object(BrowserConfig)) as usccb:
         mass = await usccb.get_mass_from_date(date.date(), types)
         if not mass:
             logger.error("Failed to retrieve mass for %s", date)
@@ -56,7 +57,7 @@ async def get_readings(date: datetime.datetime, types: list[models.MassType] | N
 @click.option("--date", type=click.DateTime([_DATE_TIME_FMT]), default=_TODAY)
 async def get_mass_types(date: datetime.datetime) -> None:
     """List all mass types available for a given date."""
-    async with USCCB() as usccb:
+    async with USCCB(click.get_current_context().find_object(BrowserConfig)) as usccb:
         mass_types = await usccb.get_mass_types(date.date())
     for mass_type in mass_types:
         print(mass_type.name)  # noqa: T201
@@ -108,7 +109,7 @@ async def get_sunday_readings_range(
 async def _get_readings_range(
     dates: Iterable[datetime.date], types: list[models.MassType] | None, save: str | None
 ) -> None:
-    async with USCCB() as usccb:
+    async with USCCB(click.get_current_context().find_object(BrowserConfig)) as usccb:
         tasks = [usccb.get_mass_from_date(dt, types) for dt in dates]
         responses = await asyncio.gather(*tasks)
         masses = [m for m in responses if m]

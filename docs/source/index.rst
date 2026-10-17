@@ -1,10 +1,8 @@
 catholic-mass-readings
-=====
+======================
 
 Welcome to the catholic-mass-readings documentation! Here you will find links to the core modules and examples of how to use each.
 
-
-A Python package that enables converting a US Zip Code into a timezone.
 
 Provides an API for scraping the web page from `Daily Readings <https://bible.usccb.org/bible/readings/>`_ website of United States Conference of Catholic Bishops.
 
@@ -17,6 +15,8 @@ If there is functionality that is missing or an error in the docs, please open a
 .. toctree::
     :maxdepth: 1
 
+    browser
+    catholic_mass_readings/challenge
     catholic_mass_readings/constants
     catholic_mass_readings/models
     catholic_mass_readings/usccb
@@ -32,6 +32,11 @@ You can also clone the repo and run the following command in the project root to
 
     $ pip install -e .
 
+The site sometimes requires a browser to pass a JavaScript challenge. Browser support is optional; to enable it,
+install the ``browser`` extra (see :doc:`browser` for configuration and Docker usage):
+
+    $ pip install 'catholic-mass-readings[browser]'
+
 Indices and tables
 ------------------
 
@@ -40,11 +45,12 @@ Indices and tables
 * :ref:`search`
 
 Examples
------------------
+--------
 
 The following example queries for the mass on a particular date:
 
-.. code-block:: Python
+.. code-block:: python
+
     import asyncio
     import datetime
 
@@ -56,10 +62,11 @@ The following example queries for the mass on a particular date:
 
 The following example queries for a range of Sunday masses:
 
-.. code-block:: Python
+.. code-block:: python
+
     async with USCCB() as usccb:
         dates = usccb.get_sunday_mass_dates(datetime.date(2024, 12, 25), datetime.date(2025, 1, 25))
-        tasks = [usccb.get_mass_from_date(dt, types) for dt in dates]
+        tasks = [usccb.get_mass_from_date(dt) for dt in dates]
         responses = await asyncio.gather(*tasks)
         masses = [m for m in responses if m]
         masses.sort(key=lambda m: m.date.toordinal() if m.date else -1)
@@ -69,7 +76,8 @@ The following example queries for a range of Sunday masses:
 
 To query for a range of masses (step how you want to):
 
-.. code-block:: Python
+.. code-block:: python
+
     async with USCCB() as usccb:
         dates = usccb.get_mass_dates(datetime.date(2024, 12, 25), datetime.date(2025, 1, 25), step=datetime.timedelta(days=1))
         tasks = [usccb.get_mass_from_date(dt) for dt in dates]
@@ -82,7 +90,8 @@ To query for a range of masses (step how you want to):
 
 To query for the available mass types for a particular date:
 
-.. code-block:: Python
+.. code-block:: python
+
     async with USCCB() as usccb:
         mass_types = await usccb.get_mass_types(datetime.date(2024, 12, 25))
         for mass_type in mass_types:
