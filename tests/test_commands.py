@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 from typing import TYPE_CHECKING, Final
 from unittest.mock import AsyncMock, patch
 
@@ -24,7 +24,7 @@ _VERSE: Final[Verse] = Verse(
 _READING: Final[Reading] = Reading(verses=[_VERSE], text="In the beginning God created heaven and earth.")
 _SECTION: Final[Section] = Section(type_=SectionType.READING, header="Reading I", readings=[_READING])
 _MASS: Final[Mass] = Mass(
-    date=datetime.date(2025, 8, 6),
+    date=dt.date(2025, 8, 6),
     type_=MassType.DEFAULT,
     url="https://bible.usccb.org/bible/readings/080625.cfm",
     title="Transfiguration of the Lord",

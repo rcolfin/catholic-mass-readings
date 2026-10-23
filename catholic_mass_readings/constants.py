@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import re
 from typing import TYPE_CHECKING, Final
-
-import pytz
+from zoneinfo import ZoneInfo
 
 if TYPE_CHECKING:
-    import datetime
+    import datetime as dt
 
 SUNDAY_DAY_OF_WEEK: Final[int] = 6
 
@@ -14,7 +13,7 @@ DATE_FMT: Final[str] = "%m%d%y"
 
 OR_PATTERN: Final[re.Pattern[str]] = re.compile("OR[:]?$", re.IGNORECASE)
 
-DEFAULT_TIMEZONE: Final[datetime.tzinfo] = pytz.timezone("America/New_York")
+DEFAULT_TIMEZONE: Final[dt.tzinfo] = ZoneInfo("America/New_York")
 
 READING_TITLE_FMT: Final[str] = "A reading from the {TITLE}"
 DAILY_READING_DEFAULT_MSS_URL_FMT: Final[str] = "https://bible.usccb.org/bible/readings/{DATE:%m%d%y}.cfm"

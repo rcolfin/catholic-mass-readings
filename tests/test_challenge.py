@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import sys
 import time
 from pathlib import Path
@@ -112,7 +112,7 @@ async def test_get_mass_solves_challenge_and_retries(monkeypatch: Any) -> None:
     monkeypatch.setattr(requests.AsyncSession, "get", mock_get)
     _mock_solve(monkeypatch, calls)
 
-    date = datetime.date(2025, 8, 6)
+    date = dt.date(2025, 8, 6)
     async with USCCB(challenge.BrowserConfig()) as usccb:
         masses = [await usccb.get_mass(date, models.MassType.DEFAULT) for _ in range(2)]
 
@@ -132,7 +132,7 @@ async def test_concurrent_challenges_are_solved_once(monkeypatch: Any) -> None:
     monkeypatch.setattr(requests.AsyncSession, "head", mock_head)
     _mock_solve(monkeypatch, calls)
 
-    date = datetime.date(2025, 8, 6)
+    date = dt.date(2025, 8, 6)
     async with USCCB(challenge.BrowserConfig()) as usccb:
         types = await usccb.get_mass_types(date)
 
@@ -150,7 +150,7 @@ async def test_forbidden_get_that_is_not_the_challenge_is_not_solved(monkeypatch
     _mock_solve(monkeypatch, calls)
 
     async with USCCB(challenge.BrowserConfig()) as usccb:
-        assert await usccb.get_mass_from_date(datetime.date(2025, 8, 6)) is None
+        assert await usccb.get_mass_from_date(dt.date(2025, 8, 6)) is None
     assert calls == []
 
 
@@ -164,7 +164,7 @@ async def test_still_challenged_after_solving_raises(monkeypatch: Any) -> None:
 
     async with USCCB(challenge.BrowserConfig()) as usccb:
         with pytest.raises(challenge.ChallengeError, match="Still challenged"):
-            await usccb.get_mass_from_date(datetime.date(2025, 8, 6))
+            await usccb.get_mass_from_date(dt.date(2025, 8, 6))
 
 
 @pytest.mark.asyncio
@@ -186,13 +186,13 @@ async def test_failed_solve_is_not_retried_by_waiting_requests(monkeypatch: Any)
 
     async with USCCB(challenge.BrowserConfig()) as usccb:
         with pytest.raises(challenge.ChallengeError, match="Timed out"):
-            await usccb.get_mass_types(datetime.date(2025, 8, 6))
+            await usccb.get_mass_types(dt.date(2025, 8, 6))
         await anyio.sleep(0.05)  # let the remaining requests finish
         assert len(calls) == 1
 
         # A later request tries again.
         with pytest.raises(challenge.ChallengeError, match="Timed out"):
-            await usccb.get_mass_types(datetime.date(2025, 8, 6))
+            await usccb.get_mass_types(dt.date(2025, 8, 6))
         await anyio.sleep(0.05)
         assert len(calls) == 2  # noqa: PLR2004
 
@@ -214,7 +214,7 @@ async def test_request_solves_when_concurrent_clearance_does_not_work(monkeypatc
     _mock_solve(monkeypatch, calls)
 
     async with usccb:
-        mass = await usccb.get_mass(datetime.date(2025, 8, 6), models.MassType.DEFAULT)
+        mass = await usccb.get_mass(dt.date(2025, 8, 6), models.MassType.DEFAULT)
 
     assert mass is not None
     assert len(calls) == 1
@@ -455,7 +455,7 @@ async def test_cached_clearance_is_reused_without_solving(monkeypatch: Any, tmp_
     _mock_solve(monkeypatch, calls)
 
     async with USCCB(challenge.BrowserConfig(cookie_cache=path)) as usccb:
-        mass = await usccb.get_mass(datetime.date(2025, 8, 6), models.MassType.DEFAULT)
+        mass = await usccb.get_mass(dt.date(2025, 8, 6), models.MassType.DEFAULT)
 
     assert mass is not None
     assert calls == []
@@ -476,7 +476,7 @@ async def test_solved_clearance_is_saved(monkeypatch: Any, tmp_path: Path) -> No
     _mock_solve(monkeypatch, calls)
 
     async with USCCB(challenge.BrowserConfig(cookie_cache=path)) as usccb:
-        await usccb.get_mass(datetime.date(2025, 8, 6), models.MassType.DEFAULT)
+        await usccb.get_mass(dt.date(2025, 8, 6), models.MassType.DEFAULT)
 
     assert len(calls) == 1
     assert await challenge.load_clearance(path) == CLEARANCE

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 from typing import Final
 
 import pytest
@@ -131,47 +131,47 @@ def test_lookup_book_unknown_key_returns_none() -> None:
     [
         (
             "https://bible.usccb.org/bible/readings/122525.cfm",
-            datetime.date(2025, 12, 25),
+            dt.date(2025, 12, 25),
             "",
         ),
         (
             "https://bible.usccb.org/bible/readings/040625-YearA.cfm",
-            datetime.date(2025, 4, 6),
+            dt.date(2025, 4, 6),
             "YearA",
         ),
         (
             "https://bible.usccb.org/bible/readings/040625-YearB.cfm",
-            datetime.date(2025, 4, 6),
+            dt.date(2025, 4, 6),
             "YearB",
         ),
         (
             "https://bible.usccb.org/bible/readings/040625-YearC.cfm",
-            datetime.date(2025, 4, 6),
+            dt.date(2025, 4, 6),
             "YearC",
         ),
         (
             "https://bible.usccb.org/bible/readings/122525-Dawn.cfm",
-            datetime.date(2025, 12, 25),
+            dt.date(2025, 12, 25),
             "Dawn",
         ),
         (
             "https://bible.usccb.org/bible/readings/122525-Day.cfm",
-            datetime.date(2025, 12, 25),
+            dt.date(2025, 12, 25),
             "Day",
         ),
         (
             "https://bible.usccb.org/bible/readings/122525-Night.cfm",
-            datetime.date(2025, 12, 25),
+            dt.date(2025, 12, 25),
             "Night",
         ),
         (
             "https://bible.usccb.org/bible/readings/122525-Vigil.cfm",
-            datetime.date(2025, 12, 25),
+            dt.date(2025, 12, 25),
             "Vigil",
         ),
     ],
 )
-def test_parse_url_valid(url: str, expected_date: datetime.date, expected_type: str) -> None:
+def test_parse_url_valid(url: str, expected_date: dt.date, expected_type: str) -> None:
     result = utils.parse_url(url)
     assert result is not None
     assert result[0] == expected_date

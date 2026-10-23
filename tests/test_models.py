@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 from typing import Any, Final
 
 import pytest
@@ -308,7 +308,7 @@ def test_section_repr() -> None:
 
 def test_mass_date_str() -> None:
     mass = Mass(
-        date=datetime.date(2025, 8, 6),
+        date=dt.date(2025, 8, 6),
         type_=MassType.DEFAULT,
         url="https://example.com",
         title="Transfiguration",
@@ -324,7 +324,7 @@ def test_mass_date_str_no_date() -> None:
 
 def test_mass_to_dict_with_date() -> None:
     mass = Mass(
-        date=datetime.date(2025, 8, 6),
+        date=dt.date(2025, 8, 6),
         type_=MassType.DAY,
         url="https://example.com",
         title="Test Mass",
@@ -341,7 +341,7 @@ def test_mass_to_dict_with_date() -> None:
 def test_mass_to_dict_default_type_excluded() -> None:
     """MassType.DEFAULT is '' (falsy) so it is excluded from to_dict."""
     mass = Mass(
-        date=datetime.date(2025, 8, 6),
+        date=dt.date(2025, 8, 6),
         type_=MassType.DEFAULT,
         url="https://example.com",
         title="Test",
@@ -360,7 +360,7 @@ def test_mass_to_dict_no_date() -> None:
 
 def test_mass_repr() -> None:
     mass = Mass(
-        date=datetime.date(2025, 8, 6),
+        date=dt.date(2025, 8, 6),
         type_=MassType.DEFAULT,
         url="https://example.com",
         title="Transfiguration",
@@ -375,7 +375,7 @@ def test_mass_str_contains_title_and_url() -> None:
     reading = Reading(verses=[_GENESIS_VERSE], text="In the beginning...")
     section = Section(type_=SectionType.READING, header="Reading I", readings=[reading])
     mass = Mass(
-        date=datetime.date(2025, 8, 6),
+        date=dt.date(2025, 8, 6),
         type_=MassType.DEFAULT,
         url="https://example.com",
         title="Test Mass",
@@ -396,7 +396,7 @@ def test_mass_str_no_date() -> None:
 def test_mass_to_dict_with_datetime_object() -> None:
     """Mass.to_dict() must extract the .date() from a datetime.datetime value."""
     mass = Mass(
-        date=datetime.datetime(2025, 8, 6, 10, 30, tzinfo=datetime.timezone.utc),  # type: ignore[arg-type]
+        date=dt.datetime(2025, 8, 6, 10, 30, tzinfo=dt.timezone.utc),  # type: ignore[arg-type]
         type_=MassType.DAY,
         url="https://example.com",
         title="Test",

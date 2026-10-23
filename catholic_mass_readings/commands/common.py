@@ -55,7 +55,7 @@ LOG_LEVELS: Final[list[str]] = [
     f"[env: {ENV_PREFIX}COOKIE_CACHE]",
 )
 @click.pass_context
-async def cli(  # noqa: PLR0913
+async def cli(  # noqa: PLR0913, PLR0917
     ctx: click.Context,
     log_level: str,
     browser_cdp_url: str | None,

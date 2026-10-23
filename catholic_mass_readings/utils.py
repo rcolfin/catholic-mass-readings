@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import logging
 import re
 from collections import defaultdict
@@ -196,7 +196,7 @@ def lookup_book(key: str | None) -> dict[str, str] | None:
     return new_testament_book
 
 
-def parse_url(url: str) -> tuple[datetime.date, str] | None:
+def parse_url(url: str) -> tuple[dt.date, str] | None:
     """
     Parses the url into datetime.date and str representing the type.
 
@@ -229,9 +229,9 @@ def parse_url(url: str) -> tuple[datetime.date, str] | None:
     if m is None:
         return None
 
-    dt = datetime.datetime.strptime(m.groups()[0], constants.DATE_FMT).replace(tzinfo=constants.DEFAULT_TIMEZONE).date()
+    date = dt.datetime.strptime(m.groups()[0], constants.DATE_FMT).replace(tzinfo=constants.DEFAULT_TIMEZONE).date()
     type_ = m.groups()[1]
-    return dt, type_
+    return date, type_
 
 
 @lru_cache(maxsize=1)
