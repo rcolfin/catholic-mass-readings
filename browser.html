@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>Browser support and Docker &#8212; catholic-mass-readings 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=75810a84" />
+    <link rel="stylesheet" type="text/css" href="_static/material.css?v=79c92029" />
+    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="challenge" href="catholic_mass_readings/challenge.html" />
+    <link rel="prev" title="catholic-mass-readings" href="index.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=blue data-md-color-accent=light-blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#browser" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="index.html" title="catholic-mass-readings 0.1.0 documentation"
+           class="md-header-nav__button md-logo">
+          
+            &nbsp;
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">catholic-mass-readings DOCS</span>
+          <span class="md-header-nav__topic"> Browser support and Docker </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder=""Search""
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/rcolfin/catholic-mass-readings" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    catholic-mass-readings
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+  
+  <script src="_static/javascripts/version_dropdown.js"></script>
+  <script>
+    var json_loc = ""versions.json"",
+        target_loc = "../",
+        text = "Versions";
+    $( document ).ready( add_version_dropdown(json_loc, target_loc, text));
+  </script>
+  
+
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list">
+          <li class="md-tabs__item"><a href="index.html" class="md-tabs__link">catholic-mass-readings 0.1.0 documentation</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="index.html" title="catholic-mass-readings 0.1.0 documentation" class="md-nav__button md-logo">
+      
+        <img src="_static/" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="index.html"
+       title="catholic-mass-readings 0.1.0 documentation">catholic-mass-readings DOCS</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/rcolfin/catholic-mass-readings" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    catholic-mass-readings
+  </div>
+</a>
+    </div>
+  
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">"Contents"</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#browser--page-root" class="md-nav__link">Browser support and Docker</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#installing" class="md-nav__link">Installing</a>
+        </li>
+        <li class="md-nav__item"><a href="#configuration" class="md-nav__link">Configuration</a>
+        </li>
+        <li class="md-nav__item"><a href="#docker" class="md-nav__link">Docker</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#browser-in-the-image" class="md-nav__link">Browser in the image</a>
+        </li>
+        <li class="md-nav__item"><a href="#using-a-remote-browser" class="md-nav__link">Using a remote browser</a>
+        </li>
+        <li class="md-nav__item"><a href="#without-a-browser" class="md-nav__link">Without a browser</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#troubleshooting" class="md-nav__link">Troubleshooting</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/browser.rst.txt">Show Source</a> </li>
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section id="browser-support-and-docker">
+<h1 id="browser--page-root">Browser support and Docker<a class="headerlink" href="#browser--page-root" title="Link to this heading">¶</a></h1>
+<p>The USCCB site sometimes answers with a “Checking connection” page that requires JavaScript to pass.
+When that happens, a browser is driven through <a class="reference external" href="https://playwright.dev/python/">Playwright</a> to pass the
+challenge once, and its cookie is reused for the rest of the requests made by the same <code class="docutils literal notranslate"><span class="pre">USCCB</span></code> instance.</p>
+<p>Most requests are never challenged, so the browser is optional: without it the package works as usual, and
+<a class="reference internal" href="catholic_mass_readings/challenge.html#catholic_mass_readings.challenge.ChallengeError" title="catholic_mass_readings.challenge.ChallengeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">catholic_mass_readings.challenge.ChallengeError</span></code></a> is raised only if the challenge is encountered.</p>
+<section id="installing">
+<h2 id="installing">Installing<a class="headerlink" href="#installing" title="Link to this heading">¶</a></h2>
+<p>Install the <code class="docutils literal notranslate"><span class="pre">browser</span></code> extra, which adds the <code class="docutils literal notranslate"><span class="pre">playwright</span></code> Python package:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install 'catholic-mass-readings[browser]'
+</pre></div>
+</div>
+<p>Then either install a browser for Playwright to launch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ playwright install chromium            # or: playwright install --with-deps chromium (Linux, as root)
+</pre></div>
+</div>
+<p>or connect to a browser running somewhere else (see <a class="reference internal" href="#using-a-remote-browser">Using a remote browser</a>), in which case no browser
+needs to be installed where this package runs.</p>
+</section>
+<section id="configuration">
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h2>
+<p>The browser is configured with environment variables, the matching CLI options, or a
+<a class="reference internal" href="catholic_mass_readings/challenge.html#catholic_mass_readings.challenge.BrowserConfig" title="catholic_mass_readings.challenge.BrowserConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">catholic_mass_readings.challenge.BrowserConfig</span></code></a> in code. CLI options take precedence over the environment variables, and
+choosing how to obtain the browser on the command line (<code class="docutils literal notranslate"><span class="pre">--browser-cdp-url</span></code>, <code class="docutils literal notranslate"><span class="pre">--browser-ws-endpoint</span></code> or
+<code class="docutils literal notranslate"><span class="pre">--browser-channel</span></code>) replaces the way set in the environment.</p>
+<table>
+<colgroup>
+<col style="width: 35.0%"/>
+<col style="width: 25.0%"/>
+<col style="width: 40.0%"/>
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Environment variable</p></th>
+<th class="head"><p>CLI option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><em>(none set)</em></p></td>
+<td></td>
+<td><p>Launch Playwright’s bundled headless Chromium (requires <code class="docutils literal notranslate"><span class="pre">playwright</span> <span class="pre">install</span> <span class="pre">chromium</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CATHOLIC_MASS_READINGS_BROWSER_CHANNEL</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--browser-channel</span></code></p></td>
+<td><p>Launch an installed browser instead (<code class="docutils literal notranslate"><span class="pre">chrome</span></code>, <code class="docutils literal notranslate"><span class="pre">msedge</span></code>, …).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CATHOLIC_MASS_READINGS_BROWSER_CDP_URL</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--browser-cdp-url</span></code></p></td>
+<td><p>Connect to a running Chromium-based browser over the Chrome DevTools Protocol.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CATHOLIC_MASS_READINGS_BROWSER_WS_ENDPOINT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--browser-ws-endpoint</span></code></p></td>
+<td><p>Connect to a <a class="reference external" href="https://playwright.dev/docs/docker#remote-connection">Playwright server</a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CATHOLIC_MASS_READINGS_BROWSER_HEADLESS</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--browser-headless</span></code> / <code class="docutils literal notranslate"><span class="pre">--browser-headed</span></code></p></td>
+<td><p>Whether a launched browser is headless (default: <code class="docutils literal notranslate"><span class="pre">true</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CATHOLIC_MASS_READINGS_BROWSER_TIMEOUT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--browser-timeout</span></code></p></td>
+<td><p>Seconds to wait for the challenge (default: <code class="docutils literal notranslate"><span class="pre">30</span></code>). Raise it on slow machines.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CATHOLIC_MASS_READINGS_BROWSER_COOKIE_CACHE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--browser-cookie-cache</span></code></p></td>
+<td><p>File in which to save the challenge cookie, so that separate runs reuse it until it expires
+(about 30 minutes). The file is only readable by the current user.</p></td>
+</tr>
+</tbody>
+</table>
+<p>In code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">catholic_mass_readings</span><span class="w"> </span><span class="kn">import</span> <span class="n">USCCB</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">catholic_mass_readings.challenge</span><span class="w"> </span><span class="kn">import</span> <span class="n">BrowserConfig</span><span class="p">,</span> <span class="n">ChallengeError</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">BrowserConfig</span><span class="p">(</span><span class="n">ws_endpoint</span><span class="o">=</span><span class="s2">"ws://playwright:3000/"</span><span class="p">,</span> <span class="n">cookie_cache</span><span class="o">=</span><span class="s2">"~/.cache/catholic-mass-readings/cookies.json"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">with</span> <span class="n">USCCB</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="k">as</span> <span class="n">usccb</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="o">...</span>
+    <span class="k">except</span> <span class="n">ChallengeError</span><span class="p">:</span>
+        <span class="o">...</span>  <span class="c1"># the challenge could not be passed (no browser, timed out, ...)</span>
+</pre></div>
+</div>
+<p>When no <code class="docutils literal notranslate"><span class="pre">BrowserConfig</span></code> is given, <code class="docutils literal notranslate"><span class="pre">USCCB()</span></code> uses <a class="reference internal" href="catholic_mass_readings/challenge.html#catholic_mass_readings.challenge.BrowserConfig.from_env" title="catholic_mass_readings.challenge.BrowserConfig.from_env"><code class="xref py py-meth docutils literal notranslate"><span class="pre">catholic_mass_readings.challenge.BrowserConfig.from_env()</span></code></a>.</p>
+</section>
+<section id="docker">
+<h2 id="docker">Docker<a class="headerlink" href="#docker" title="Link to this heading">¶</a></h2>
+<p>There are two ways to use the package in a container: install a browser in the image, or keep the image small
+and connect to a browser that runs elsewhere.</p>
+<section id="browser-in-the-image">
+<h3 id="browser-in-the-image">Browser in the image<a class="headerlink" href="#browser-in-the-image" title="Link to this heading">¶</a></h3>
+<p>The simplest setup is self-contained, at the cost of a larger image (Chromium and its system libraries):</p>
+<div class="highlight-dockerfile notranslate"><div class="highlight"><pre><span></span><span class="k">FROM</span><span class="w"> </span><span class="s">python:3.13-slim</span>
+
+<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span><span class="s1">'catholic-mass-readings[browser]'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>playwright<span class="w"> </span>install<span class="w"> </span>--with-deps<span class="w"> </span>chromium
+
+<span class="c"># Optional: reuse the challenge cookie across runs (mount a volume at /cache).</span>
+<span class="k">ENV</span><span class="w"> </span><span class="nv">CATHOLIC_MASS_READINGS_BROWSER_COOKIE_CACHE</span><span class="o">=</span>/cache/cookies.json
+
+<span class="k">ENTRYPOINT</span><span class="w"> </span><span class="p">[</span><span class="s2">"python"</span><span class="p">,</span><span class="w"> </span><span class="s2">"-m"</span><span class="p">,</span><span class="w"> </span><span class="s2">"catholic_mass_readings"</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>catholic-mass-readings<span class="w"> </span>.
+docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-v<span class="w"> </span>catholic-mass-readings-cache:/cache<span class="w"> </span>catholic-mass-readings<span class="w"> </span>get-mass<span class="w"> </span>--date<span class="w"> </span><span class="m">2025</span>-08-06
+</pre></div>
+</div>
+</section>
+<section id="using-a-remote-browser">
+<h3 id="using-a-remote-browser">Using a remote browser<a class="headerlink" href="#using-a-remote-browser" title="Link to this heading">¶</a></h3>
+<p>When connecting to a running browser, the image only needs the <code class="docutils literal notranslate"><span class="pre">playwright</span></code> Python package, not a browser:</p>
+<div class="highlight-dockerfile notranslate"><div class="highlight"><pre><span></span><span class="k">FROM</span><span class="w"> </span><span class="s">python:3.13-slim</span>
+
+<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span><span class="s1">'catholic-mass-readings[browser]'</span>
+
+<span class="k">ENTRYPOINT</span><span class="w"> </span><span class="p">[</span><span class="s2">"python"</span><span class="p">,</span><span class="w"> </span><span class="s2">"-m"</span><span class="p">,</span><span class="w"> </span><span class="s2">"catholic_mass_readings"</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>A Playwright server container.</strong> Run the official Playwright image next to it with Docker Compose. The
+server’s Playwright version must match the <code class="docutils literal notranslate"><span class="pre">playwright</span></code> package installed in the image (check it with
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">show</span> <span class="pre">playwright</span></code>, and pin it in the Dockerfile with <code class="docutils literal notranslate"><span class="pre">'playwright==1.64.0'</span></code> if needed):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">playwright</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mcr.microsoft.com/playwright:v1.64.0-noble</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npx -y playwright@1.64.0 run-server --port 3000 --host 0.0.0.0</span>
+<span class="w">    </span><span class="nt">init</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="w">  </span><span class="nt">catholic-mass-readings</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get-mass --date 2025-08-06</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">CATHOLIC_MASS_READINGS_BROWSER_WS_ENDPOINT</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ws://playwright:3000/</span>
+<span class="w">      </span><span class="nt">CATHOLIC_MASS_READINGS_BROWSER_COOKIE_CACHE</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/cache/cookies.json</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cache:/cache</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">playwright</span>
+
+<span class="nt">volumes</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">cache</span><span class="p">:</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>catholic-mass-readings
+</pre></div>
+</div>
+<p>The Playwright server takes a few seconds to start (longer on the first start, while <code class="docutils literal notranslate"><span class="pre">npx</span></code> downloads it), and
+<code class="docutils literal notranslate"><span class="pre">depends_on</span></code> does not wait for it to be ready. To avoid a failed first run, start it ahead of time with
+<code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">up</span> <span class="pre">-d</span> <span class="pre">playwright</span></code>.</p>
+<p><strong>Chrome on the host</strong> (e.g. Windows) over the Chrome DevTools Protocol. Start Chrome with remote debugging and a
+dedicated profile:</p>
+<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>chrome.exe --remote-debugging-port=9222 --user-data-dir=<span class="nv">%TEMP%</span>\chrome-cdp
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-e<span class="w"> </span><span class="nv">CATHOLIC_MASS_READINGS_BROWSER_CDP_URL</span><span class="o">=</span>http://&lt;host-ip&gt;:9222<span class="w"> </span>catholic-mass-readings<span class="w"> </span>get-mass<span class="w"> </span>--date<span class="w"> </span><span class="m">2025</span>-08-06
+</pre></div>
+</div>
+<p>Notes on connecting over CDP:</p>
+<ul>
+<li><p>Use an IP address in the CDP URL. Chrome rejects DevTools requests whose <code class="docutils literal notranslate"><span class="pre">Host</span></code> is a name other than
+<code class="docutils literal notranslate"><span class="pre">localhost</span></code>, and <code class="docutils literal notranslate"><span class="pre">localhost</span></code> itself may first resolve to IPv6, adding a long delay (use <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code>).
+This also rules out <code class="docutils literal notranslate"><span class="pre">host.docker.internal</span></code>.</p></li>
+<li><p>Chrome only listens on <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code>, so reaching it from a container or another machine needs a port forward,
+e.g. on Windows (as administrator):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">netsh</span> <span class="n">interface</span> <span class="n">portproxy</span> <span class="n">add</span> <span class="n">v4tov4</span> <span class="n">listenaddress</span><span class="o">=&lt;</span><span class="n">host</span><span class="o">-</span><span class="n">ip</span><span class="o">&gt;</span> <span class="n">listenport</span><span class="o">=</span><span class="mi">9222</span> <span class="n">connectaddress</span><span class="o">=</span><span class="mf">127.0.0.1</span> <span class="n">connectport</span><span class="o">=</span><span class="mi">9222</span>
+</pre></div>
+</div>
+</li>
+<li><p>Anyone who can reach the debugging port has full control of that browser profile. Use a dedicated
+<code class="docutils literal notranslate"><span class="pre">--user-data-dir</span></code> and don’t expose the port beyond the machines that need it.</p></li>
+</ul>
+</section>
+<section id="without-a-browser">
+<h3 id="without-a-browser">Without a browser<a class="headerlink" href="#without-a-browser" title="Link to this heading">¶</a></h3>
+<p>A plain <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">catholic-mass-readings</span></code> also works in a container. Requests are rarely challenged; when one is,
+<code class="docutils literal notranslate"><span class="pre">ChallengeError</span></code> is raised with instructions. A cookie cache file written by a run that had a browser can be
+shared (e.g. through a volume) with runs that don’t, until the cookie expires.</p>
+</section>
+</section>
+<section id="troubleshooting">
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">¶</a></h2>
+<p>Run the CLI with <code class="docutils literal notranslate"><span class="pre">--log-level</span> <span class="pre">DEBUG</span></code> (or enable <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> logging for the <code class="docutils literal notranslate"><span class="pre">catholic_mass_readings</span></code> logger) to see each page
+the browser loads, whether it was the challenge, and when the challenge is restarted.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ChallengeError:</span> <span class="pre">...</span> <span class="pre">Install</span> <span class="pre">it</span> <span class="pre">with:</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">'catholic-mass-readings[browser]'</span></code>: the <code class="docutils literal notranslate"><span class="pre">browser</span></code> extra is not installed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ChallengeError:</span> <span class="pre">The</span> <span class="pre">browser</span> <span class="pre">failed</span> <span class="pre">...</span> <span class="pre">Executable</span> <span class="pre">doesn't</span> <span class="pre">exist</span></code>: run <code class="docutils literal notranslate"><span class="pre">playwright</span> <span class="pre">install</span> <span class="pre">chromium</span></code>, or
+connect to a remote browser instead.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ChallengeError:</span> <span class="pre">Timed</span> <span class="pre">out</span> <span class="pre">...</span></code>: the browser could not pass the challenge in time. On slow machines, raise
+<code class="docutils literal notranslate"><span class="pre">--browser-timeout</span></code>.</p></li>
+</ul>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="index.html" title="catholic-mass-readings"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> "Previous" </span> catholic-mass-readings </span>
+              </div>
+            </a>
+          
+          
+            <a href="catholic_mass_readings/challenge.html" title="challenge"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> "Next" </span> challenge </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2024, Robert Colfin.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>
