@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-import datetime
+import datetime as dt
 import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Final
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 _DATE_TIME_FMT: Final[str] = "%Y-%m-%d"
 _TODAY: Final[str] = USCCB.today().strftime(_DATE_TIME_FMT)
-_WEEK_LATER: Final[str] = (USCCB.today() + datetime.timedelta(days=7)).strftime(_DATE_TIME_FMT)
+_WEEK_LATER: Final[str] = (USCCB.today() + dt.timedelta(days=7)).strftime(_DATE_TIME_FMT)
 _TYPES: Final[list[str]] = [t.name for t in models.MassType]
 
 
@@ -39,7 +39,7 @@ def _get_mass_types(ctx: click.Context, param: click.Option, value: tuple[str, .
     callback=_get_mass_types,
 )
 @click.option("--save", type=click.Path(dir_okay=False, writable=True))
-async def get_readings(date: datetime.datetime, types: list[models.MassType] | None, save: str | None) -> None:
+async def get_readings(date: dt.datetime, types: list[models.MassType] | None, save: str | None) -> None:
     """Fetch the mass readings for a specific date and print them to stdout."""
     async with USCCB(click.get_current_context().find_object(BrowserConfig)) as usccb:
         mass = await usccb.get_mass_from_date(date.date(), types)
@@ -55,7 +55,7 @@ async def get_readings(date: datetime.datetime, types: list[models.MassType] | N
 
 @cli.command("get-mass-types")
 @click.option("--date", type=click.DateTime([_DATE_TIME_FMT]), default=_TODAY)
-async def get_mass_types(date: datetime.datetime) -> None:
+async def get_mass_types(date: dt.datetime) -> None:
     """List all mass types available for a given date."""
     async with USCCB(click.get_current_context().find_object(BrowserConfig)) as usccb:
         mass_types = await usccb.get_mass_types(date.date())
@@ -78,10 +78,10 @@ async def get_mass_types(date: datetime.datetime) -> None:
 @click.option("--step", type=int, default=7, help="The number of days to step.")
 @click.option("--save", type=click.Path(dir_okay=False, writable=True))
 async def get_readings_range(
-    start: datetime.datetime, end: datetime.datetime, types: list[models.MassType] | None, step: int, save: str | None
+    start: dt.datetime, end: dt.datetime, types: list[models.MassType] | None, step: int, save: str | None
 ) -> None:
     """Fetch mass readings for each date in a range, stepping by a given number of days."""
-    dates = USCCB.get_mass_dates(start.date(), end.date(), step=datetime.timedelta(days=step))
+    dates = USCCB.get_mass_dates(start.date(), end.date(), step=dt.timedelta(days=step))
     await _get_readings_range(dates, types, save)
 
 
@@ -99,16 +99,14 @@ async def get_readings_range(
 )
 @click.option("--save", type=click.Path(dir_okay=False, writable=True))
 async def get_sunday_readings_range(
-    start: datetime.datetime, end: datetime.datetime, types: list[models.MassType] | None, save: str | None
+    start: dt.datetime, end: dt.datetime, types: list[models.MassType] | None, save: str | None
 ) -> None:
     """Fetch Sunday mass readings for each Sunday in a date range."""
     dates = USCCB.get_sunday_mass_dates(start.date(), end.date())
     await _get_readings_range(dates, types, save)
 
 
-async def _get_readings_range(
-    dates: Iterable[datetime.date], types: list[models.MassType] | None, save: str | None
-) -> None:
+async def _get_readings_range(dates: Iterable[dt.date], types: list[models.MassType] | None, save: str | None) -> None:
     async with USCCB(click.get_current_context().find_object(BrowserConfig)) as usccb:
         tasks = [usccb.get_mass_from_date(dt, types) for dt in dates]
         responses = await asyncio.gather(*tasks)

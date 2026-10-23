@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
-import datetime
+import datetime as dt
 import html
 import logging
 import re
@@ -76,19 +76,19 @@ class USCCB:
         return self
 
     @staticmethod
-    def today() -> datetime.date:
+    def today() -> dt.date:
         """Gets today's date"""
-        return datetime.datetime.now(tz=constants.DEFAULT_TIMEZONE).date()
+        return dt.datetime.now(tz=constants.DEFAULT_TIMEZONE).date()
 
     @staticmethod
-    def max_query_date() -> datetime.date:
+    def max_query_date() -> dt.date:
         """Gets latest date that can be queried"""
         today = USCCB.today()
-        dt = datetime.date(today.year + 1, today.month, 1) + datetime.timedelta(days=31)
-        return datetime.date(dt.year, dt.month, 1)
+        next_month = dt.date(today.year + 1, today.month, 1) + dt.timedelta(days=31)
+        return dt.date(next_month.year, next_month.month, 1)
 
     @staticmethod
-    def get_sunday_mass_dates(start: datetime.date, end: datetime.date | None = None) -> Iterable[datetime.date]:
+    def get_sunday_mass_dates(start: dt.date, end: dt.date | None = None) -> Iterable[dt.date]:
         """Gets the list of Sunday mass dates from the next Sunday until `end` or `max_query_date`."""
         if end is not None and start >= end:
             msg = f"Invalid range ({start} >= {end})"
@@ -96,18 +96,18 @@ class USCCB:
 
         weekday = start.weekday()
         if weekday != constants.SUNDAY_DAY_OF_WEEK:
-            new_start = start + datetime.timedelta(days=constants.SUNDAY_DAY_OF_WEEK) - datetime.timedelta(days=weekday)
+            new_start = start + dt.timedelta(days=constants.SUNDAY_DAY_OF_WEEK) - dt.timedelta(days=weekday)
             if end is not None and end < new_start:
                 # Incase the adjustment to start now means that end is before start, adjust end as well.
                 end += new_start - start
             start = new_start
 
-        return USCCB.get_mass_dates(start, end, datetime.timedelta(weeks=1))
+        return USCCB.get_mass_dates(start, end, dt.timedelta(weeks=1))
 
     @staticmethod
     def get_mass_dates(
-        start: datetime.date, end: datetime.date | None = None, step: datetime.timedelta = datetime.timedelta(weeks=1)
-    ) -> Iterable[datetime.date]:
+        start: dt.date, end: dt.date | None = None, step: dt.timedelta = dt.timedelta(weeks=1)
+    ) -> Iterable[dt.date]:
         """
         Gets the list of mass dates from the current date until
         `end` or `max_query_date` stepping by the `step` arg."""
@@ -142,21 +142,19 @@ class USCCB:
 
     async def get_mass(
         self,
-        date: datetime.date,
+        date: dt.date,
         type_: models.MassType,
     ) -> models.Mass | None:
         """Gets the mass for the date and type."""
         url = type_.to_url(date)
         return await self._get_mass(url, date, type_)
 
-    async def get_mass_from_date(
-        self, date: datetime.date, types: list[models.MassType] | None = None
-    ) -> models.Mass | None:
+    async def get_mass_from_date(self, date: dt.date, types: list[models.MassType] | None = None) -> models.Mass | None:
         """
         Gets the first mass for the specified date and type.
 
         Args:
-            date (datetime.date): The mass date.
+            date (dt.date): The mass date.
             types (list[models.MassType]): The list of mass types to use (defaults to DEFAULT_MASS_TYPES)
 
         Returns:
@@ -175,7 +173,7 @@ class USCCB:
 
     async def get_mass_from_url(self, url: str) -> models.Mass | None:
         """Gets the mass at the particular url."""
-        date: datetime.date | None = None
+        date: dt.date | None = None
         type_: models.MassType | str | None = None
         with contextlib.suppress(ValueError):
             parsed_url = utils.parse_url(url)
@@ -186,12 +184,12 @@ class USCCB:
 
         return await self._get_mass(url, date, type_)
 
-    async def get_mass_types(self, date: datetime.date) -> list[models.MassType]:
+    async def get_mass_types(self, date: dt.date) -> list[models.MassType]:
         """
         Gets the list of mass types for the specified date.
 
         Args:
-            date (datetime.date): The mass date.
+            date (dt.date): The mass date.
 
         Returns:
             list[models.MassType] for each of the supported mass types.
@@ -201,7 +199,7 @@ class USCCB:
         return sorted(type_ for type_, r in zip(types, responses, strict=True) if r.ok)
 
     async def _get_mass(
-        self, url: str, date: datetime.date | None, type_: models.MassType | str | None
+        self, url: str, date: dt.date | None, type_: models.MassType | str | None
     ) -> models.Mass | None:
         logger.debug("Querying url: %s", url)
         try:

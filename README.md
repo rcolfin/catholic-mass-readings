@@ -125,7 +125,9 @@ async with USCCB() as usccb:
 
 # To query for a range of masses (step how you want to):
 async with USCCB() as usccb:
-    dates = usccb.get_mass_dates(datetime.date(2024, 12, 25), datetime.date(2025, 1, 25), step=datetime.timedelta(days=1))
+    dates = usccb.get_mass_dates(
+        datetime.date(2024, 12, 25), datetime.date(2025, 1, 25), step=datetime.timedelta(days=1)
+    )
     tasks = [usccb.get_mass_from_date(dt) for dt in dates]
     responses = await asyncio.gather(*tasks)
     masses = [m for m in responses if m]

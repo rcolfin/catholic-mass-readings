@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 from enum import Enum, EnumMeta, IntEnum, auto, unique
 from typing import TYPE_CHECKING, Any, NamedTuple, cast
 
@@ -36,31 +36,31 @@ class MassType(str, Enum, metaclass=_CaseInsensitiveEnumMeta):
     def __repr__(self) -> str:
         return self.name
 
-    def to_url(self, dt: datetime.date) -> str:
+    def to_url(self, dt: dt.date) -> str:
         """
         Generates a URL for the specified date.
 
         Args:
-            dt (datetime.date): The mass date.
+            dt (dt.date): The mass date.
 
         Returns:
             str containing the url.
 
-        >>> MassType.DEFAULT.to_url(datetime.date(2025, 4, 6))
+        >>> MassType.DEFAULT.to_url(dt.date(2025, 4, 6))
         'https://bible.usccb.org/bible/readings/040625.cfm'
-        >>> MassType.DAWN.to_url(datetime.date(2025, 4, 6))
+        >>> MassType.DAWN.to_url(dt.date(2025, 4, 6))
         'https://bible.usccb.org/bible/readings/040625-Dawn.cfm'
-        >>> MassType.DAY.to_url(datetime.date(2025, 4, 6))
+        >>> MassType.DAY.to_url(dt.date(2025, 4, 6))
         'https://bible.usccb.org/bible/readings/040625-Day.cfm'
-        >>> MassType.NIGHT.to_url(datetime.date(2025, 4, 6))
+        >>> MassType.NIGHT.to_url(dt.date(2025, 4, 6))
         'https://bible.usccb.org/bible/readings/040625-Night.cfm'
-        >>> MassType.VIGIL.to_url(datetime.date(2025, 4, 6))
+        >>> MassType.VIGIL.to_url(dt.date(2025, 4, 6))
         'https://bible.usccb.org/bible/readings/040625-Vigil.cfm'
-        >>> MassType.YEARA.to_url(datetime.date(2025, 4, 6))
+        >>> MassType.YEARA.to_url(dt.date(2025, 4, 6))
         'https://bible.usccb.org/bible/readings/040625-YearA.cfm'
-        >>> MassType.YEARB.to_url(datetime.date(2025, 4, 6))
+        >>> MassType.YEARB.to_url(dt.date(2025, 4, 6))
         'https://bible.usccb.org/bible/readings/040625-YearB.cfm'
-        >>> MassType.YEARC.to_url(datetime.date(2025, 4, 6))
+        >>> MassType.YEARC.to_url(dt.date(2025, 4, 6))
         'https://bible.usccb.org/bible/readings/040625-YearC.cfm'
         """
         return self._to_url_fmt().format(DATE=dt)
@@ -315,7 +315,7 @@ class Section(NamedTuple):
 
 
 class Mass(NamedTuple):
-    date: datetime.date | None
+    date: dt.date | None
     type_: MassType | str | None
     url: str
     title: str
@@ -348,7 +348,7 @@ class Mass(NamedTuple):
         """Returns a dictionary representation."""
         r: dict[str, Any] = {"url": self.url, "title": self.title, "sections": [s.to_dict() for s in self.sections]}
         if self.date:
-            date = self.date.date() if isinstance(self.date, datetime.datetime) else self.date
+            date = self.date.date() if isinstance(self.date, dt.datetime) else self.date
             r["date"] = date.isoformat()
         if self.type_:
             r["type_"] = self.type_

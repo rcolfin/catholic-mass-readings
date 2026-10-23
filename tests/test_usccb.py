@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import json
 from pathlib import Path
 from typing import Any, Final
@@ -34,7 +34,7 @@ async def _test_mass_parse(monkeypatch: Any, html_path: Path, mass_json_path: Pa
     expected_mass_json = json.loads(mass_json_path.read_text(encoding="utf-8"))  # noqa: ASYNC240
     _setup_mock(monkeypatch, html_path)
     async with USCCB() as usccb:
-        date = datetime.datetime.strptime(expected_mass_json["date"], "%Y-%m-%d").date()  # noqa: DTZ007
+        date = dt.datetime.strptime(expected_mass_json["date"], "%Y-%m-%d").date()  # noqa: DTZ007
         mass = await usccb.get_mass(date, models.MassType.DEFAULT)
         assert mass is not None
         assert expected_mass_json == mass.to_dict()
@@ -63,7 +63,7 @@ async def test_multiple_reading_parse(monkeypatch: Any) -> None:
 
 def test_today_returns_date() -> None:
     today = USCCB.today()
-    assert isinstance(today, datetime.date)
+    assert isinstance(today, dt.date)
 
 
 def test_max_query_date_is_after_today() -> None:
@@ -71,42 +71,42 @@ def test_max_query_date_is_after_today() -> None:
 
 
 def test_get_mass_dates_yields_sequence() -> None:
-    start = datetime.date(2025, 1, 1)
-    end = datetime.date(2025, 1, 22)
-    dates = list(USCCB.get_mass_dates(start, end, step=datetime.timedelta(weeks=1)))
+    start = dt.date(2025, 1, 1)
+    end = dt.date(2025, 1, 22)
+    dates = list(USCCB.get_mass_dates(start, end, step=dt.timedelta(weeks=1)))
     assert dates == [
-        datetime.date(2025, 1, 1),
-        datetime.date(2025, 1, 8),
-        datetime.date(2025, 1, 15),
+        dt.date(2025, 1, 1),
+        dt.date(2025, 1, 8),
+        dt.date(2025, 1, 15),
     ]
 
 
 def test_get_mass_dates_invalid_range_raises() -> None:
     with pytest.raises(ValueError, match="Invalid range"):
-        list(USCCB.get_mass_dates(datetime.date(2025, 1, 15), datetime.date(2025, 1, 1)))
+        list(USCCB.get_mass_dates(dt.date(2025, 1, 15), dt.date(2025, 1, 1)))
 
 
 def test_get_sunday_mass_dates_starting_on_sunday() -> None:
     # 2025-01-05 is a Sunday
-    start = datetime.date(2025, 1, 5)
-    end = datetime.date(2025, 1, 27)
+    start = dt.date(2025, 1, 5)
+    end = dt.date(2025, 1, 27)
     dates = list(USCCB.get_sunday_mass_dates(start, end))
     assert all(d.weekday() == constants.SUNDAY_DAY_OF_WEEK for d in dates)
-    assert dates[0] == datetime.date(2025, 1, 5)
+    assert dates[0] == dt.date(2025, 1, 5)
 
 
 def test_get_sunday_mass_dates_advances_to_sunday() -> None:
     # 2025-01-06 is a Monday — should advance to 2025-01-12 (next Sunday)
-    start = datetime.date(2025, 1, 6)
-    end = datetime.date(2025, 1, 27)
+    start = dt.date(2025, 1, 6)
+    end = dt.date(2025, 1, 27)
     dates = list(USCCB.get_sunday_mass_dates(start, end))
     assert all(d.weekday() == constants.SUNDAY_DAY_OF_WEEK for d in dates)
-    assert dates[0] == datetime.date(2025, 1, 12)
+    assert dates[0] == dt.date(2025, 1, 12)
 
 
 def test_get_sunday_mass_dates_invalid_range_raises() -> None:
     with pytest.raises(ValueError, match="Invalid range"):
-        list(USCCB.get_sunday_mass_dates(datetime.date(2025, 1, 15), datetime.date(2025, 1, 1)))
+        list(USCCB.get_sunday_mass_dates(dt.date(2025, 1, 15), dt.date(2025, 1, 1)))
 
 
 # ---------------------------------------------------------------------------
@@ -186,7 +186,7 @@ async def test_get_mass_from_date_returns_none_when_all_fail(monkeypatch: Any) -
 
     monkeypatch.setattr(requests.AsyncSession, "get", mock_get_raises)
     async with USCCB() as usccb:
-        mass = await usccb.get_mass_from_date(datetime.date(2025, 8, 6))
+        mass = await usccb.get_mass_from_date(dt.date(2025, 8, 6))
     assert mass is None
 
 
@@ -195,7 +195,7 @@ async def test_get_mass_from_date_with_explicit_types(monkeypatch: Any) -> None:
     html_path = DATA_PATH / "mass-single-reading.html"
     _setup_mock(monkeypatch, html_path)
     async with USCCB() as usccb:
-        mass = await usccb.get_mass_from_date(datetime.date(2025, 8, 6), types=[models.MassType.DEFAULT])
+        mass = await usccb.get_mass_from_date(dt.date(2025, 8, 6), types=[models.MassType.DEFAULT])
     assert mass is not None
 
 
@@ -234,7 +234,7 @@ async def test_get_mass_from_url_valid(monkeypatch: Any) -> None:
     async with USCCB() as usccb:
         mass = await usccb.get_mass_from_url("https://bible.usccb.org/bible/readings/080625.cfm")
     assert mass is not None
-    assert mass.date == datetime.date(2025, 8, 6)
+    assert mass.date == dt.date(2025, 8, 6)
     assert mass.type_ == models.MassType.DEFAULT
 
 
@@ -257,7 +257,7 @@ async def test_get_mass_from_url_unrecognized_url(monkeypatch: Any) -> None:
 
 @pytest.mark.asyncio
 async def test_get_mass_types_returns_matching_types(monkeypatch: Any) -> None:
-    date = datetime.date(2025, 8, 6)
+    date = dt.date(2025, 8, 6)
     default_url = models.MassType.DEFAULT.to_url(date)
 
     class _MockResponse:
@@ -284,9 +284,9 @@ async def test_get_mass_types_returns_matching_types(monkeypatch: Any) -> None:
 def test_get_sunday_mass_dates_adjusts_end_when_before_first_sunday() -> None:
     # 2025-01-06 is Monday; 2025-01-07 is Tuesday — before next Sunday (2025-01-12).
     # The implementation adjusts end forward to keep at least one result.
-    start = datetime.date(2025, 1, 6)
-    end = datetime.date(2025, 1, 7)
+    start = dt.date(2025, 1, 6)
+    end = dt.date(2025, 1, 7)
     dates = list(USCCB.get_sunday_mass_dates(start, end))
     assert len(dates) == 1
-    assert dates[0] == datetime.date(2025, 1, 12)
+    assert dates[0] == dt.date(2025, 1, 12)
     assert dates[0].weekday() == constants.SUNDAY_DAY_OF_WEEK
